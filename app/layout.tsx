@@ -4,7 +4,9 @@ import { PWARegister } from "@/components/PWARegister";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/components/LanguageContext";
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://converza-green.vercel.app").replace(/\/$/, "");
+// Le repli doit être une adresse que nous possédons : il part dans les liens
+// de vitrine que les marchands envoient à leurs clients.
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://pasrel-green.vercel.app").replace(/\/$/, "");
 
 export const metadata: Metadata = {
   // Les vignettes de lien sont des URL absolues : sans cette base, elles
