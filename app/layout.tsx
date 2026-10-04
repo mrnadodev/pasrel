@@ -4,9 +4,35 @@ import { PWARegister } from "@/components/PWARegister";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/components/LanguageContext";
 
-// Le repli doit être une adresse que nous possédons : il part dans les liens
-// de vitrine que les marchands envoient à leurs clients.
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://pasrel-green.vercel.app").replace(/\/$/, "");
+/**
+ * L'adresse publique du site.
+ *
+ * Le repli doit être une adresse que nous possédons : elle part dans les
+ * liens de vitrine que les marchands envoient à leurs clients.
+ *
+ * La valeur est nettoyée et vérifiée avant d'être rendue. Elle était reprise
+ * telle quelle, et `new URL()` plus bas levait sur une saisie malformée : une
+ * variable d'environnement avec un guillemet de trop a suffi à faire échouer
+ * la construction entière du site, sur une page sans rapport. Une adresse mal
+ * saisie fait désormais retomber sur le repli, ce qui est visible et
+ * réparable, au lieu d'arrêter tout.
+ */
+function adressePublique(): string {
+  const REPLI = "https://pasrel-green.vercel.app";
+  const brut = (process.env.NEXT_PUBLIC_SITE_URL ?? "")
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .replace(/\/+$/, "");
+  if (!brut) return REPLI;
+  try {
+    new URL(brut);
+    return brut;
+  } catch {
+    return REPLI;
+  }
+}
+
+const siteUrl = adressePublique();
 
 export const metadata: Metadata = {
   // Les vignettes de lien sont des URL absolues : sans cette base, elles
