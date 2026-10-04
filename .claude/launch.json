@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "converza-dev",
+      "name": "pasrel-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
@@ -12,7 +12,7 @@
       "autoPort": true
     },
     {
-      "name": "converza-staging",
+      "name": "pasrel-staging",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
