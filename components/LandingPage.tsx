@@ -50,6 +50,13 @@ export function LandingPage({
   useScrollReveal(rootRef);
   const scrolled = useScrolledPast(40);
 
+  // « Voir une vitrine » menait en dur sur /b/ti-kok-boutik. Une adresse écrite
+  // dans le code ne sait pas qu'une boutique s'est retirée de la page d'accueil,
+  // ni qu'elle a fermé : le bouton principal du haut de page aurait continué d'y
+  // envoyer tout le monde, ou renvoyé un 404. Il suit maintenant la même liste
+  // que « Ils vendent déjà », et se rabat sur l'annuaire s'il n'y a personne.
+  const vitrineExemple = showcase[0]?.slug ? `/b/${showcase[0].slug}` : "/boutik";
+
   // Prix et textes des offres viennent de la console : un changement s'y fait
   // une seule fois, et se voit ici comme sur la page Abonnement des marchands.
   const PLAN_ORDER = ["gratis", "pro", "premium"];
@@ -140,7 +147,7 @@ export function LandingPage({
                 style={{ background: ACTION, color: INK, boxShadow: "0 12px 32px rgba(37,211,102,0.28)" }}>
                 {c.hero.ctaPrimary}
               </Link>
-              <Link href="/b/ti-kok-boutik"
+              <Link href={vitrineExemple}
                 className="flex h-[58px] items-center justify-center gap-2.5 rounded-xl border px-7 text-[16px] font-semibold text-white transition-colors hover:bg-white/10"
                 style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.16)" }}>
                 <PlayIcon />
