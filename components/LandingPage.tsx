@@ -264,11 +264,16 @@ export function LandingPage({
           </p>
         </div>
 
+        {/* Clé par rang, pas par texte : ces listes sont fixes et ne se
+            réordonnent jamais, alors qu'une clé tirée du libellé change à
+            chaque langue. React détruisait alors les cartes pour en remonter
+            d'autres, qui naissaient masquées par l'animation d'apparition —
+            la section devenait blanche en anglais et en créole. */}
         <div className="grid gap-6 md:grid-cols-3">
           {c.how.steps.map((step, i) => {
             const dark = i === 2;
             return (
-              <div key={step.title} data-reveal
+              <div key={i} data-reveal
                 className="psr-lift flex flex-col gap-4 rounded-[20px] p-8"
                 style={{ ["--reveal-delay" as string]: `${i * 110}ms`, background: dark ? INK : "#F2F6F4" }}>
                 <span className="text-[52px] font-extrabold leading-none tracking-[-2.5px]" style={{ color: dark ? ACTION : "#00A884" }}>
@@ -354,7 +359,7 @@ export function LandingPage({
             </p>
             <div className="flex flex-col gap-3.5 pt-2">
               {c.message.points.map((point, i) => (
-                <div key={point} data-reveal="left" style={{ ["--reveal-delay" as string]: `${160 + i * 90}ms` }} className="flex items-center gap-3.5">
+                <div key={i} data-reveal="left" style={{ ["--reveal-delay" as string]: `${160 + i * 90}ms` }} className="flex items-center gap-3.5">
                   <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(37,211,102,0.16)" }}>
                     <CheckIcon />
                   </span>
@@ -386,7 +391,7 @@ export function LandingPage({
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {c.features.items.map((item, i) => (
-            <div key={item.title} data-reveal
+            <div key={i} data-reveal
               className="psr-lift flex flex-col gap-3.5 rounded-[18px] border p-7"
               style={{ ["--reveal-delay" as string]: `${(i % 3) * 90}ms`, borderColor: "#E6ECEA" }}>
               <div className="flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: i === 3 ? "#FFF3DF" : "#E7F7F1" }}>
@@ -529,7 +534,7 @@ export function LandingPage({
           </div>
           <div className="flex flex-col gap-3.5">
             {c.faq.items.map((item, i) => (
-              <div key={item.q} data-reveal
+              <div key={i} data-reveal
                 className="flex flex-col gap-2.5 rounded-2xl p-6 sm:p-7"
                 style={{ ["--reveal-delay" as string]: `${i * 80}ms`, background: "#F7FAF9" }}>
                 <span className="text-[17px] font-bold sm:text-[18px]">{item.q}</span>

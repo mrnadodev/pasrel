@@ -5,6 +5,9 @@ import { useEffect, useState, type RefObject } from "react";
 /** Marge sous le bord bas de l'écran : l'élément se révèle un peu avant d'entrer. */
 const TRIGGER_MARGIN = 0.12;
 
+/** Ce qui reste à révéler. Relu à chaque passage, jamais mis en cache. */
+const A_REVELER = "[data-reveal]:not(.is-revealed)";
+
 /**
  * Révèle les éléments marqués `data-reveal` à l'intérieur de `rootRef`
  * lorsqu'ils entrent dans l'écran.
@@ -15,20 +18,20 @@ const TRIGGER_MARGIN = 0.12;
  * jamais et le contenu resterait invisible. Un calcul de rectangle donne le
  * même résultat sans dépendre du compositeur.
  *
- * Chaque élément n'est révélé qu'une fois, et la liste se vide au fur et à
- * mesure ; quand elle est vide, on cesse d'écouter.
+ * La liste des éléments est relue à chaque passage au lieu d'être figée au
+ * montage, et un `MutationObserver` réveille la mesure quand le DOM change.
+ * C'est indispensable : changer de langue remplace les nœuds des listes dont
+ * la clé React est un texte traduit. Les nouveaux nœuds arrivaient masqués,
+ * et plus personne ne les regardait — des sections entières de la page
+ * d'accueil restaient blanches en anglais et en créole.
  */
 export function useScrollReveal(rootRef: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
 
-    let pending = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
-    if (pending.length === 0) return;
-
     const revealAll = () => {
-      pending.forEach((n) => n.classList.add("is-revealed"));
-      pending = [];
+      root.querySelectorAll<HTMLElement>(A_REVELER).forEach((n) => n.classList.add("is-revealed"));
     };
 
     // Mouvement réduit demandé : on affiche tout, sans transition.
@@ -46,7 +49,7 @@ export function useScrollReveal(rootRef: RefObject<HTMLElement | null>) {
 
     const check = () => {
       frame = 0;
-      if (stopped || pending.length === 0) return;
+      if (stopped) return;
 
       const viewport = window.innerHeight || document.documentElement.clientHeight || 0;
       // Hauteur nulle : la page n'est pas encore mise en page. On ne décide
@@ -54,21 +57,15 @@ export function useScrollReveal(rootRef: RefObject<HTMLElement | null>) {
       if (viewport === 0) return;
 
       const limit = viewport * (1 - TRIGGER_MARGIN);
-      const still: HTMLElement[] = [];
 
-      for (const node of pending) {
+      for (const node of root.querySelectorAll<HTMLElement>(A_REVELER)) {
         // `top < limite` suffit : un élément déjà remonté au-dessus de l'écran
         // a un `top` négatif et doit lui aussi être visible.
         if (node.getBoundingClientRect().top < limit) {
           node.classList.add("is-revealed");
           revealed++;
-        } else {
-          still.push(node);
         }
       }
-
-      pending = still;
-      if (pending.length === 0) teardown();
     };
 
     // Étranglement par minuteur plutôt que par requestAnimationFrame : un
@@ -79,10 +76,17 @@ export function useScrollReveal(rootRef: RefObject<HTMLElement | null>) {
       frame = window.setTimeout(check, 60);
     };
 
+    // Le DOM bouge après le montage : React remplace les nœuds des listes dont
+    // la clé est un texte traduit dès que la langue change. Sans ce guetteur,
+    // les remplaçants naîtraient masqués et personne ne reviendrait les voir.
+    const observer = new MutationObserver(schedule);
+    observer.observe(root, { childList: true, subtree: true });
+
     function teardown() {
       if (stopped) return;
       stopped = true;
       if (frame) window.clearTimeout(frame);
+      observer.disconnect();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     }
