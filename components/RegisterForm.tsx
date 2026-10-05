@@ -76,7 +76,10 @@ export function RegisterForm({
     setError(null);
     setInfo(null);
     start(async () => {
-      const res = await registerMerchant(f);
+      // La langue part avec le formulaire : c'est celle du courriel de
+      // bienvenue. On la lit à l'envoi, pas au montage — elle a pu changer
+      // entre-temps avec le sélecteur en haut de page.
+      const res = await registerMerchant({ ...f, language });
       if (res.ok) {
         router.push("/");
         router.refresh();

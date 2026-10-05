@@ -8,6 +8,10 @@ import { isAdminEmail } from "@/lib/admin";
 import { logAdminAction } from "@/lib/audit-logger";
 import { logAppError } from "@/lib/app-errors";
 import { nextPlanUntil } from "@/lib/plans";
+import { planByKey } from "@/lib/platform-store";
+import { storefrontBaseUrl } from "@/lib/order";
+import { envoyerCourriel } from "@/lib/mail";
+import { courrielAbonnement } from "@/lib/i18n/mail";
 
 async function requireAdmin() {
   const sb = createClient();
@@ -16,6 +20,87 @@ async function requireAdmin() {
   } = await sb.auth.getUser();
   if (!user || !isAdminEmail(user.email)) return null;
   return user.email;
+}
+
+/**
+ * Prévient le marchand que son abonnement est actif.
+ *
+ * Tout est enveloppé : un nom de boutique introuvable, une adresse manquante ou
+ * un envoi refusé n'ont aucun effet sur l'activation, qui est déjà faite. La
+ * seule trace d'un échec est une ligne dans le journal d'erreurs.
+ *
+ * La langue du marchand n'est pas enregistrée en base : on écrit en français,
+ * la langue par défaut de l'application. Le jour où une colonne la retient,
+ * c'est le seul argument à changer ici.
+ */
+async function previenirAbonnement(arg: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  admin: any;
+  businessId: string;
+  paymentId: string;
+  plan: string;
+  start: Date;
+  end: Date;
+}) {
+  try {
+    const { data: biz } = await arg.admin
+      .from("businesses")
+      .select("name")
+      .eq("id", arg.businessId)
+      .maybeSingle();
+
+    const { data: membre } = await arg.admin
+      .from("members")
+      .select("user_id, full_name")
+      .eq("business_id", arg.businessId)
+      .eq("role", "owner")
+      .maybeSingle();
+    if (!membre?.user_id) return;
+
+    const { data: compte } = await arg.admin.auth.admin.getUserById(membre.user_id);
+    const adresse = compte?.user?.email;
+    if (!adresse) return;
+
+    const { data: paiement } = await arg.admin
+      .from("subscription_payments")
+      .select("amount_cents, pay_method, pay_ref")
+      .eq("id", arg.paymentId)
+      .maybeSingle();
+
+    const offre = await planByKey(arg.plan);
+    const rendu = courrielAbonnement("fr", {
+      ownerName: membre.full_name ?? "",
+      businessName: biz?.name ?? "",
+      planName: offre.name,
+      amountHtg: Math.round((paiement?.amount_cents ?? offre.priceGdes * 100) / 100),
+      method: paiement?.pay_method ?? "—",
+      reference: paiement?.pay_ref ?? null,
+      start: arg.start,
+      end: arg.end,
+      baseUrl: storefrontBaseUrl(),
+    });
+
+    const envoi = await envoyerCourriel({
+      to: adresse,
+      subject: rendu.subject,
+      text: rendu.text,
+      html: rendu.html,
+    });
+    if (envoi.etat === "echec") {
+      await logAppError({
+        scope: "mail.abonnement",
+        message: envoi.raison,
+        businessId: arg.businessId,
+        details: { plan: arg.plan },
+      });
+    }
+  } catch (e) {
+    await logAppError({
+      scope: "mail.abonnement",
+      message: e instanceof Error ? e.message : "erreur inconnue",
+      businessId: arg.businessId,
+    });
+  }
 }
 
 export async function activatePlan(paymentId: string, businessId: string, plan: string) {
@@ -37,6 +122,16 @@ export async function activatePlan(paymentId: string, businessId: string, plan: 
     targetPaymentId: paymentId,
     details: { plan, plan_until: until.toISOString() },
   });
+
+  // Accusé d'abonnement. Le marchand a envoyé de l'argent à la main et attendait
+  // sans rien savoir : il découvrait l'activation en se connectant. Ce message
+  // est sa preuve — daté, chiffré, et chez lui plutôt que chez nous.
+  //
+  // Il part après l'activation et ne peut pas la défaire : un abonnement activé
+  // reste activé même si le courriel échoue.
+  if (!r1.error && !r2.error) {
+    await previenirAbonnement({ admin, businessId, paymentId, plan, start: new Date(), end: until });
+  }
 
   revalidatePath("/admin");
   return { ok: !r1.error && !r2.error, error: r1.error?.message ?? r2.error?.message };

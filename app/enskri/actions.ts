@@ -5,6 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SECTOR_THEME } from "@/lib/themes";
 import { hasSupabase, setBusinessOverride, resetDataForNewBusiness } from "@/lib/data";
+import { storefrontBaseUrl } from "@/lib/order";
+import { envoyerCourriel } from "@/lib/mail";
+import { courrielBienvenue } from "@/lib/i18n/mail";
+import { logAppError } from "@/lib/app-errors";
+import type { Language } from "@/lib/i18n/translations";
 
 export interface RegisterInput {
   businessName: string;
@@ -14,6 +19,8 @@ export interface RegisterInput {
   fullName: string;
   email: string;
   password: string;
+  /** Langue affichée au moment de l'inscription : celle du courriel de bienvenue. */
+  language?: Language;
 }
 
 function slugify(s: string): string {
@@ -215,5 +222,36 @@ export async function registerMerchant(
 
   oublierBrouillon();
   setDisplayCookies(ownerName);
+
+  // Mot de bienvenue : l'adresse de la vitrine, les premiers gestes, et le lien
+  // des conditions. C'est aussi le premier message que la boîte du marchand voit
+  // venir de ce domaine — un domaine qui n'envoie jamais rien puis envoie un
+  // lien de mot de passe ressemble à un hameçonnage, et finit en indésirables.
+  //
+  // L'envoi vient APRÈS la création et ne peut pas l'annuler : une boutique qui
+  // existe reste créée même si le courriel se perd.
+  const destinataire = (existingUser?.email ?? input.email).trim();
+  const rendu = courrielBienvenue(input.language ?? "fr", {
+    ownerName,
+    businessName: input.businessName.trim(),
+    slug,
+    baseUrl: storefrontBaseUrl(),
+  });
+  const envoi = await envoyerCourriel({
+    to: destinataire,
+    subject: rendu.subject,
+    text: rendu.text,
+    html: rendu.html,
+  });
+  if (envoi.etat === "echec") {
+    await logAppError({
+      scope: "mail.bienvenue",
+      message: envoi.raison,
+      businessId: bizId,
+      userId,
+      details: { slug },
+    });
+  }
+
   return { ok: true, slug };
 }
