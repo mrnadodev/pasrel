@@ -1,10 +1,10 @@
-﻿import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { drawReelFrame, pickMimeType, REEL_H, REEL_W, SLIDE_MS, type ReelBrand, type ReelSlide } from "./reel";
 
-// Un diaporama se casse sans bruit : une diapositive sautÃ©e, un fondu qui ne
-// revient pas au dÃ©but, une police qui dÃ©borde. Rien de tout cela ne lÃ¨ve
-// d'erreur â€” le marchand dÃ©couvre seulement une vidÃ©o ratÃ©e aprÃ¨s l'avoir
-// publiÃ©e.
+// Un diaporama se casse sans bruit : une diapositive sautée, un fondu qui ne
+// revient pas au début, une police qui déborde. Rien de tout cela ne lève
+// d'erreur — le marchand découvre seulement une vidéo ratée après l'avoir
+// publiée.
 
 /** Contexte de dessin factice, qui note ce qu'on lui demande. */
 function contexteEspion() {
@@ -47,16 +47,16 @@ const brand: ReelBrand = {
 };
 
 const slides: ReelSlide[] = [
-  { name: "Tennis Nike", price: "7 000 HTG", detail: "Homme Â· 38 Ã  42", image: null },
+  { name: "Tennis Nike", price: "7 000 HTG", detail: "Homme · 38 à 42", image: null },
   { name: "Sandale", price: "3 000 HTG", detail: null, image: null },
-  { name: "Chemiz gason", price: "18 000 HTG", detail: "Homme Â· M", image: null },
+  { name: "Chemiz gason", price: "18 000 HTG", detail: "Homme · M", image: null },
 ];
 
 const textesDe = (appels: { methode: string; args: unknown[] }[]) =>
   appels.filter((a) => a.methode === "fillText").map((a) => String(a.args[0]));
 
 describe("image du diaporama", () => {
-  it("montre la diapositive qui correspond Ã  l'instant", () => {
+  it("montre la diapositive qui correspond à l'instant", () => {
     for (const [i, attendu] of ["Tennis Nike", "Sandale", "Chemiz gason"].entries()) {
       const { ctx, appels } = contexteEspion();
       // Milieu de la diapositive : hors de tout fondu.
@@ -67,15 +67,15 @@ describe("image du diaporama", () => {
 
   it("superpose deux diapositives pendant le fondu", () => {
     const { ctx, appels } = contexteEspion();
-    // Juste avant la bascule : l'ancienne s'efface, la suivante apparaÃ®t.
+    // Juste avant la bascule : l'ancienne s'efface, la suivante apparaît.
     drawReelFrame(ctx, slides, brand, SLIDE_MS - 100, "sans-serif");
     const textes = textesDe(appels);
     expect(textes).toContain("Tennis Nike");
     expect(textes).toContain("Sandale");
   });
 
-  it("boucle : la fin du diaporama revient sur la premiÃ¨re", () => {
-    // Sans cela, la derniÃ¨re diapositive se fondrait dans du vide.
+  it("boucle : la fin du diaporama revient sur la première", () => {
+    // Sans cela, la dernière diapositive se fondrait dans du vide.
     const { ctx, appels } = contexteEspion();
     drawReelFrame(ctx, slides, brand, slides.length * SLIDE_MS - 100, "sans-serif");
     const textes = textesDe(appels);
@@ -84,13 +84,13 @@ describe("image du diaporama", () => {
   });
 
   it("porte le nom de la boutique et le lien sur chaque image", () => {
-    // Une vidÃ©o repartagÃ©e sans lÃ©gende doit encore dire d'oÃ¹ elle vient.
+    // Une vidéo repartagée sans légende doit encore dire d'où elle vient.
     for (const ms of [0, SLIDE_MS, SLIDE_MS * 2.5]) {
       const { ctx, appels } = contexteEspion();
       drawReelFrame(ctx, slides, brand, ms, "sans-serif");
       const textes = textesDe(appels);
-      expect(textes, `Ã  ${ms} ms`).toContain("N&J LUXURY");
-      expect(textes, `Ã  ${ms} ms`).toContain("pasrel.app/b/nj");
+      expect(textes, `à ${ms} ms`).toContain("N&J LUXURY");
+      expect(textes, `à ${ms} ms`).toContain("pasrel.app/b/nj");
     }
   });
 
@@ -100,7 +100,7 @@ describe("image du diaporama", () => {
     expect(textesDe(appels)).toContain("7 000 HTG");
   });
 
-  it("omet la ligne de dÃ©tail quand il n'y en a pas", () => {
+  it("omet la ligne de détail quand il n'y en a pas", () => {
     const { ctx, appels } = contexteEspion();
     drawReelFrame(ctx, slides, brand, SLIDE_MS * 1.5, "sans-serif");
     const textes = textesDe(appels);
@@ -115,8 +115,8 @@ describe("image du diaporama", () => {
     expect(textesDe(appels)).toContain("Tennis Nike");
   });
 
-  it("supporte un instant nÃ©gatif ou trÃ¨s grand", () => {
-    // La prÃ©visualisation part parfois d'un compteur remis Ã  zÃ©ro.
+  it("supporte un instant négatif ou très grand", () => {
+    // La prévisualisation part parfois d'un compteur remis à zéro.
     for (const ms of [-1200, 10 * SLIDE_MS + 37]) {
       const { ctx } = contexteEspion();
       expect(() => drawReelFrame(ctx, slides, brand, ms, "sans-serif"), String(ms)).not.toThrow();
@@ -124,8 +124,8 @@ describe("image du diaporama", () => {
   });
 });
 
-describe("choix du format vidÃ©o", () => {
-  it("prÃ©fÃ¨re le MP4, que toutes les messageries acceptent", () => {
+describe("choix du format vidéo", () => {
+  it("préfère le MP4, que toutes les messageries acceptent", () => {
     vi.stubGlobal("MediaRecorder", { isTypeSupported: () => true });
     expect(pickMimeType()?.ext).toBe("mp4");
     vi.unstubAllGlobals();
@@ -138,7 +138,7 @@ describe("choix du format vidÃ©o", () => {
   });
 
   it("rend null quand le navigateur ne sait rien enregistrer", () => {
-    // Le bouton doit alors se taire plutÃ´t que d'Ã©chouer au clic.
+    // Le bouton doit alors se taire plutôt que d'échouer au clic.
     vi.stubGlobal("MediaRecorder", { isTypeSupported: () => false });
     expect(pickMimeType()).toBeNull();
     vi.unstubAllGlobals();
