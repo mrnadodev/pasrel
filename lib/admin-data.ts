@@ -3,6 +3,7 @@ import { planOf } from "@/lib/plans";
 import { adminEmails } from "@/lib/admin";
 import { loadPlans, loadPaymentInfo, loadPlatformSettings, loadLegalInfo, loadLandingOverrides } from "@/lib/platform-store";
 import { merchantIssues, type Issue } from "@/lib/merchant-health";
+import { storefrontBaseUrl } from "@/lib/order";
 
 // Fenêtre de paiements chargée pour la file de validation, l'historique et la
 // détection de références réutilisées. Au-delà, la file n'est plus consultable.
@@ -140,7 +141,8 @@ export async function getAdminData() {
   const lastOrder = new Map<string, string | null>();
   const prodCount = new Map<string, number>();
   const agentCount = new Map<string, number>();
-  for (const s of (statsRes.data ?? []) as Record<string, unknown>[]) {
+  const statsRows = (statsRes.data ?? []) as Record<string, unknown>[];
+  for (const s of statsRows) {
     const id = String(s.business_id);
     ordCount.set(id, Number(s.orders_count) || 0);
     gmv.set(id, Number(s.gmv_cents) || 0);
@@ -380,10 +382,20 @@ export async function getAdminData() {
     serviceRoleKey: true, // sans elle, getAdminData aurait déjà renvoyé null
     adminEmails: adminEmails().length,
     inviteSecret: Boolean(process.env.INVITE_SECRET),
-    siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || "").trim(),
+    // Même source que les liens envoyés aux clients. Lire la variable
+    // d'environnement seule affichait « manquant » alors que le site a un
+    // domaine : l'adresse publique est un repli du code depuis qu'une variable
+    // mal saisie a pu arrêter toute la construction.
+    siteUrl: storefrontBaseUrl(),
     auditTable: !auditRes.error,
     statsView: !statsRes.error,
-    extendedStats: lastOrder.size > 0 && [...lastOrder.values()].some((v) => v !== null),
+    // Présence de la colonne, et non présence d'une valeur. Le contrôle
+    // demandait qu'au moins une boutique ait une date de dernière commande :
+    // une plateforme dont aucune commande n'est encaissée a un `last_order_at`
+    // nul partout, ce qui ne dit rien du schéma. La console réclamait alors
+    // des migrations déjà passées — et nommait les mauvaises, par-dessus le
+    // marché. Sans aucune boutique, il n'y a rien à mesurer : on ne crie pas.
+    extendedStats: statsRows.length === 0 || "last_order_at" in statsRows[0],
     phoneChanges: !phoneRes.error,
     support: !errorsRes.error,
     subscription: dbVersion >= 8,
