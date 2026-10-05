@@ -605,14 +605,23 @@ export async function getStorefront(
     return null;
   }
 
-  const { data: products } = await sb
-    .from("products")
-    .select("*")
-    .eq("business_id", business.id)
-    .eq("is_active", true)
-    .order("name");
+  // Colonnes nommées, et non `*`. La vitrine est lue par un visiteur anonyme :
+  // avec `*`, la quantité exacte en stock partait dans la réponse alors que la
+  // page n'affiche qu'un état. Un concurrent pouvait suivre le rythme de vente
+  // d'une boutique jour après jour. La migration 16 retire d'ailleurs cette
+  // colonne au rôle public, ce qui ferait échouer un `*`.
+  const COLS_VITRINE =
+    "id, business_id, name, category, price_cents, currency, unit, stock_state, photo_url, is_active, created_at, sold_count, photos, in_showcase, size";
+  const lire = (cols: string) =>
+    sb.from("products").select(cols).eq("business_id", business.id).eq("is_active", true).order("name");
 
-  return { business: business as Business, products: (products ?? []) as Product[] };
+  // Les colonnes de promotion datent de la migration 15 : sur un déploiement
+  // qui ne l'a pas encore passée, on sert la vitrine sans elles plutôt que de
+  // ne rien servir du tout.
+  let res = await lire(`${COLS_VITRINE}, promo_price_cents, promo_ends_at`);
+  if (res.error) res = await lire(COLS_VITRINE);
+
+  return { business: business as Business, products: (res.data ?? []) as unknown as Product[] };
 }
 
 // ---------------------------------------------------------------------------

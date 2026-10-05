@@ -75,7 +75,11 @@ export interface Business {
   listed?: boolean | null;
   default_currency: Currency;
   // Changement de numéro validé par PASRÈL (db/migrate-2026-4-numero.sql).
+  // Le numéro entier n'existe que pour le marchand et la console ; la vitrine
+  // publique ne reçoit que `previous_phone_masked` (migration 16).
   previous_phone_e164?: string | null;
+  /** « +509 ••• 1234 », calculé par la vue publique. */
+  previous_phone_masked?: string | null;
   phone_changed_at?: string | null;
   phone_notice_until?: string | null;
 }

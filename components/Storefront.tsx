@@ -314,10 +314,16 @@ export function Storefront({
             </div>
           )}
 
-          {/* Nouveau numéro : un message neutre, jamais le mot « piratage ». */}
+          {/* Nouveau numéro : un message neutre, jamais le mot « piratage ».
+              L'ancien numéro arrive déjà masqué de la base. Il était masqué
+              ici, à l'affichage, alors que la vue publique livrait le numéro
+              entier au navigateur : masquer à l'écran ne masque rien, le
+              numéro complet partait quand même et se lisait dans la réponse.
+              Le repli sur `previous_phone_e164` sert aux déploiements où la
+              migration 16 n'est pas encore passée. */}
           {phoneNotice === "banner" && (
             <div className="bg-[#E7F1FB] px-4 py-2.5 text-center text-[12.5px] font-semibold leading-snug text-[#154E85]">
-              📱 {c.phoneBanner(business.phone_e164 ?? "", maskPhone(business.previous_phone_e164))}
+              📱 {c.phoneBanner(business.phone_e164 ?? "", business.previous_phone_masked ?? maskPhone(business.previous_phone_e164))}
             </div>
           )}
 

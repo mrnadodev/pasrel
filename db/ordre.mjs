@@ -22,4 +22,5 @@ export const ORDRE_MONTAGE = [
   "migrate-2026-13-audience.sql",
   "migrate-2026-14-taille.sql",
   "migrate-2026-15-promo.sql",
+  "migrate-2026-16-exposition.sql",
 ];
