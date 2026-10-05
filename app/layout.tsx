@@ -18,7 +18,7 @@ import { LanguageProvider } from "@/components/LanguageContext";
  * réparable, au lieu d'arrêter tout.
  */
 function adressePublique(): string {
-  const REPLI = "https://pasrel-green.vercel.app";
+  const REPLI = "https://pasrel.app";
   const brut = (process.env.NEXT_PUBLIC_SITE_URL ?? "")
     .trim()
     .replace(/^["']|["']$/g, "")
