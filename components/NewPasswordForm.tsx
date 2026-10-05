@@ -67,12 +67,42 @@ export function NewPasswordForm() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // Le jeton de récupération arrive dans l'URL ; le client Supabase l'échange
-  // contre une session au chargement. On attend d'avoir cette session avant
-  // d'afficher le formulaire, sinon l'enregistrement échouerait.
+  // Le jeton de récupération arrive dans l'URL. Il peut s'y trouver sous deux
+  // formes, et il faut savoir lire les deux :
+  //
+  //   · un code dans la requête (`?code=`), le flux PKCE, que le client
+  //     Supabase échange tout seul au chargement ;
+  //   · les jetons dans le fragment (`#access_token=…`), le flux implicite —
+  //     c'est ce que renvoie l'endpoint /verify, donc tout lien de
+  //     récupération ouvert directement.
+  //
+  // Le client navigateur de @supabase/ssr est configuré en PKCE, et dans ce
+  // cas `auth-js` REFUSE un fragment implicite au lieu de le lire : il lève
+  // « Not a valid PKCE flow url ». La page concluait « lien plus valable » sur
+  // un lien parfaitement bon, et personne ne pouvait plus réinitialiser son
+  // mot de passe. On pose donc la session à la main quand les jetons sont là.
   useEffect(() => {
     let cancelled = false;
+    let timer = 0;
     const sb = createClient();
+
+    // Vrai si le fragment portait une session utilisable.
+    async function depuisLeFragment(): Promise<boolean> {
+      const brut = window.location.hash.replace(/^#/, "");
+      if (!brut) return false;
+      const p = new URLSearchParams(brut);
+      const access_token = p.get("access_token");
+      const refresh_token = p.get("refresh_token");
+      if (!access_token || !refresh_token) return false;
+
+      const { data } = await sb.auth.setSession({ access_token, refresh_token });
+      // Le jeton ne doit pas rester dans la barre d'adresse : il se copie, il
+      // se partage, et il ouvre le compte.
+      window.history.replaceState(null, "", window.location.pathname);
+      if (cancelled) return true;
+      setState(data.session ? "ready" : "invalid");
+      return true;
+    }
 
     const check = async () => {
       const {
@@ -87,12 +117,15 @@ export function NewPasswordForm() {
       if (session) setState((s) => (s === "checking" || s === "invalid" ? "ready" : s));
     });
 
-    // Petit délai : l'échange du jeton se fait juste après le montage.
-    const timer = setTimeout(check, 700);
+    // Le fragment se lit tout de suite ; sans lui, on laisse au client le temps
+    // d'échanger un code PKCE, ce qui se fait juste après le montage.
+    void depuisLeFragment().then((traite) => {
+      if (!traite && !cancelled) timer = window.setTimeout(check, 700);
+    });
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
       sub.subscription.unsubscribe();
     };
   }, []);
