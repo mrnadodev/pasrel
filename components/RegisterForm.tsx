@@ -8,16 +8,28 @@ import { CvzMark } from "@/components/CvzMark";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/components/LanguageContext";
 import { landingCopy } from "@/lib/i18n/landing";
-import { registerMerchant, type RegisterInput } from "@/app/enskri/actions";
+import { registerMerchant, type RegisterInput, type BrouillonInscription } from "@/app/enskri/actions";
 import { Select } from "@/components/ui/Select";
+
+/** À quel secteur appartient ce métier ? Sert à rouvrir les deux listes au bon
+ *  endroit quand on restaure une saisie. */
+function secteurDe(sousType: string): IndustrySectorKey | null {
+  for (const [cle, secteur] of Object.entries(INDUSTRY_SECTORS)) {
+    if (secteur.subTypes.includes(sousType)) return cle as IndustrySectorKey;
+  }
+  return null;
+}
 
 export function RegisterForm({
   finishing = false,
   defaultName = "",
+  brouillon = null,
 }: {
   /** Compte déjà authentifié à qui il ne manque que la boutique. */
   finishing?: boolean;
   defaultName?: string;
+  /** Saisie conservée pendant le détour par la confirmation d'e-mail. */
+  brouillon?: BrouillonInscription | null;
 }) {
   const router = useRouter();
   const { language } = useLanguage();
@@ -26,16 +38,23 @@ export function RegisterForm({
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
-  const [selectedSectorKey, setSelectedSectorKey] = useState<IndustrySectorKey>("commerce_vente");
+  // Le métier conservé décide des deux listes : sans ça elles rouvriraient sur
+  // « commerce » et la marchande croirait sa saisie perdue.
+  const secteurRepris = brouillon?.businessType ? secteurDe(brouillon.businessType) : null;
+  const [selectedSectorKey, setSelectedSectorKey] = useState<IndustrySectorKey>(
+    secteurRepris ?? "commerce_vente",
+  );
   const currentSector = INDUSTRY_SECTORS[selectedSectorKey];
-  const [selectedSubType, setSelectedSubType] = useState<string>(currentSector.subTypes[0]);
+  const [selectedSubType, setSelectedSubType] = useState<string>(
+    secteurRepris ? brouillon!.businessType : currentSector.subTypes[0],
+  );
 
   const [f, setF] = useState<RegisterInput>({
-    businessName: "",
-    businessType: currentSector.subTypes[0],
-    employeesCount: "",
-    phone: "",
-    fullName: defaultName,
+    businessName: brouillon?.businessName ?? "",
+    businessType: secteurRepris ? brouillon!.businessType : currentSector.subTypes[0],
+    employeesCount: brouillon?.employeesCount ?? "",
+    phone: brouillon?.phone ?? "",
+    fullName: brouillon?.fullName || defaultName,
     email: "",
     password: "",
   });

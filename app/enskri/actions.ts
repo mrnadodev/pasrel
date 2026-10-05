@@ -28,6 +28,61 @@ function slugify(s: string): string {
   );
 }
 
+/**
+ * Brouillon d'inscription.
+ *
+ * Depuis que la confirmation d'adresse est exigée, `signUp` ne rend plus de
+ * session : le compte existe, mais la boutique ne peut pas encore être créée.
+ * La marchande partait alors confirmer son e-mail, revenait se connecter, et
+ * retombait sur un formulaire vide — tout à retaper, sur un téléphone, au pire
+ * moment possible.
+ *
+ * On garde donc ce qu'elle a saisi, le temps du détour par sa boîte mail.
+ *
+ * Ni l'adresse ni le mot de passe n'y figurent : à son retour elle est
+ * connectée, l'application n'en a plus besoin, et un identifiant n'a rien à
+ * faire dans un cookie de confort. Durée deux heures : au-delà, le détour a
+ * échoué et mieux vaut repartir d'une page propre.
+ */
+const BROUILLON = "pasrel_enskri";
+
+export interface BrouillonInscription {
+  businessName: string;
+  businessType: string;
+  employeesCount: string;
+  phone: string;
+  fullName: string;
+}
+
+function garderBrouillon(input: RegisterInput) {
+  const brouillon: BrouillonInscription = {
+    businessName: input.businessName,
+    businessType: input.businessType,
+    employeesCount: input.employeesCount,
+    phone: input.phone,
+    fullName: input.fullName,
+  };
+  try {
+    cookies().set(BROUILLON, JSON.stringify(brouillon), {
+      path: "/",
+      maxAge: 60 * 60 * 2,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  } catch {
+    // hors contexte de requête
+  }
+}
+
+function oublierBrouillon() {
+  try {
+    cookies().delete(BROUILLON);
+  } catch {
+    // hors contexte de requête
+  }
+}
+
 function setDisplayCookies(ownerName: string) {
   const opts = {
     path: "/",
@@ -99,10 +154,12 @@ export async function registerMerchant(
     });
     if (aerr) return { ok: false, error: aerr.message };
     if (!auth.user) return { ok: false, error: "Erè pandan kreyasyon kont lan" };
-    // Sans session (confirmation e-mail activée), la RLS refuserait la création
-    // du business. Le compte existe : on demande de confirmer puis de se
-    // reconnecter, et la boutique se créera à ce moment-là.
+    // Sans session (confirmation e-mail activée), la boutique ne peut pas être
+    // créée maintenant : rien ne doit exister publiquement au nom d'une adresse
+    // que personne n'a encore prouvé posséder. On garde la saisie, et la
+    // boutique se créera au retour, en un clic.
     if (!auth.session) {
+      garderBrouillon(input);
       return { ok: false, needsConfirm: true, error: "Tcheke imèl ou pou konfime kont lan, apre konekte." };
     }
     userId = auth.user.id;
@@ -156,6 +213,7 @@ export async function registerMerchant(
     return { ok: false, error: merr.message };
   }
 
+  oublierBrouillon();
   setDisplayCookies(ownerName);
   return { ok: true, slug };
 }
