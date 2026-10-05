@@ -571,7 +571,10 @@ export function LandingPage({
       </section>
 
       {/* ══════════ PIED DE PAGE ══════════ */}
-      <footer className="px-5 pb-12 pt-14 sm:px-8 lg:px-12" style={{ background: "#041A15" }}>
+      {/* Marge basse généreuse : la flèche flottante de retour en haut occupe
+          les 68 premiers pixels au-dessus du bord, et venait recouvrir le
+          copyright dès qu'on atteignait le bas de la page. */}
+      <footer className="px-5 pb-24 pt-14 sm:px-8 lg:px-12" style={{ background: "#041A15" }}>
         <div className="mx-auto w-full max-w-[1240px]">
           <div className="grid gap-10 sm:grid-cols-3 lg:grid-cols-[5fr_2fr_2fr_2fr]">
             <div className="flex flex-col gap-3.5 sm:col-span-3 lg:col-span-1">
@@ -590,17 +593,22 @@ export function LandingPage({
             <FooterCol title={c.footer.languageCol} links={["Français", "Kreyòl", "English"]} />
           </div>
           {/* La signature de la marque.
+              Le nom se lisait trois fois dans ce seul pied de page : dans le
+              bloc du logo, ici, puis dans le copyright. Répété ainsi sous deux
+              phrases différentes, il ne signait plus rien — il donnait
+              l'impression d'un doublon. Il ne reste que le logo en haut, qui
+              nomme, et le copyright en bas, qui date. Entre les deux, le
+              slogan parle seul.
+
               Le retour en haut était ici, en bouton : il fallait avoir fini de
               descendre pour s'en servir. Il est devenu la flèche flottante,
               disponible tout du long. */}
-          <div className="mt-9 flex flex-col gap-4 border-t pt-9" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-            <span className="text-center text-[13.5px] font-semibold text-[#7D9A92] sm:text-left">
-              <Wordmark tone="onDark" className="font-extrabold text-white" /> · {c.footer.slogan}
+          <div className="mt-9 flex flex-col gap-3 border-t pt-9 sm:flex-row sm:items-center sm:justify-between"
+            style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+            <span className="text-[13.5px] font-semibold text-[#7D9A92]">{c.footer.slogan}</span>
+            <span className="text-[13px] text-[#5E7E75]">
+              {c.footer.rights} · {c.footer.city}
             </span>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-[13px] text-[#5E7E75]">{c.footer.rights}</span>
-              <span className="text-[13px] text-[#5E7E75]">{c.footer.city}</span>
-            </div>
           </div>
         </div>
       </footer>
