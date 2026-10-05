@@ -244,7 +244,7 @@ const fr: LandingCopy = {
     steps: [
       {
         title: "Vous créez votre vitrine",
-        body: "Nom du commerce, photos, prix, zones de livraison. Vous obtenez une adresse à vous, du type pasrel.ht/b/votre-boutique.",
+        body: "Nom du commerce, photos, prix, zones de livraison. Vous obtenez une adresse à vous, du type pasrel.app/b/votre-boutique.",
       },
       {
         title: "Vous partagez le lien",
@@ -442,7 +442,7 @@ const ht: LandingCopy = {
     steps: [
       {
         title: "Ou kreye vitrin ou",
-        body: "Non biznis la, foto, pri, zòn livrezon. Ou jwenn yon adrès pa w, tankou pasrel.ht/b/boutik-ou.",
+        body: "Non biznis la, foto, pri, zòn livrezon. Ou jwenn yon adrès pa w, tankou pasrel.app/b/boutik-ou.",
       },
       {
         title: "Ou pataje lyen an",
@@ -640,7 +640,7 @@ const en: LandingCopy = {
     steps: [
       {
         title: "You build your storefront",
-        body: "Business name, photos, prices, delivery zones. You get your own address, like pasrel.ht/b/your-shop.",
+        body: "Business name, photos, prices, delivery zones. You get your own address, like pasrel.app/b/your-shop.",
       },
       {
         title: "You share the link",
