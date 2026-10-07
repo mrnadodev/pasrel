@@ -1,10 +1,17 @@
 import { LegalView } from "@/components/LegalView";
+import { DocTitle } from "@/components/DocTitle";
+import { TITRES } from "@/lib/i18n/titres";
 import { loadLegalInfo } from "@/lib/platform-store";
 
 // Conditions d'utilisation, publiques : un marchand doit pouvoir les lire avant
 // d'ouvrir un compte, et un client avant de commander.
 export default async function TermsPage() {
-  return <LegalView doc="terms" info={await loadLegalInfo()} />;
+  return (
+    <>
+      <DocTitle titres={TITRES.conditions} />
+      <LegalView doc="terms" info={await loadLegalInfo()} />
+    </>
+  );
 }
 
 // Les coordonnées viennent de la console : la page se rend à la demande, sinon

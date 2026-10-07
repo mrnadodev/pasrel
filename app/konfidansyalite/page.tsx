@@ -1,10 +1,17 @@
 import { LegalView } from "@/components/LegalView";
+import { DocTitle } from "@/components/DocTitle";
+import { TITRES } from "@/lib/i18n/titres";
 import { loadLegalInfo } from "@/lib/platform-store";
 
 // Politique de confidentialité, publique. Elle décrit ce que le logiciel fait
 // réellement des données : voir lib/i18n/legal.ts.
 export default async function PrivacyPage() {
-  return <LegalView doc="privacy" info={await loadLegalInfo()} />;
+  return (
+    <>
+      <DocTitle titres={TITRES.confidentialite} />
+      <LegalView doc="privacy" info={await loadLegalInfo()} />
+    </>
+  );
 }
 
 // Les coordonnées viennent de la console : la page se rend à la demande, sinon

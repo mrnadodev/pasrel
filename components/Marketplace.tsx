@@ -5,8 +5,10 @@ import { formatMoney } from "@/lib/money";
 import { BackToTop } from "@/components/BackToTop";
 import { ShopLink } from "@/components/ShopLink";
 import { MarketplaceNotice } from "@/components/MarketplaceNotice";
+import { DocTitle } from "@/components/DocTitle";
 import { useLanguage } from "@/components/LanguageContext";
 import { marketplaceCopy, type MarketplaceCopy } from "@/lib/i18n/marketplace";
+import { TITRES } from "@/lib/i18n/titres";
 
 /**
  * Le rendu du Marketplace.
@@ -60,6 +62,7 @@ export function Marketplace({
 
   return (
     <main className="min-h-[100dvh] bg-[#F0F2F3]">
+      <DocTitle titres={TITRES.marketplace} />
       <header className="bg-brand px-5 py-8 sm:py-12">
         <div className="mx-auto w-full max-w-[900px]">
           <Link href="/" className="text-[12.5px] font-bold text-[#B9F5E4] hover:text-white">

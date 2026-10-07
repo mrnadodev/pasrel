@@ -3,6 +3,8 @@ import { Storefront } from "@/components/Storefront";
 import { getStorefront } from "@/lib/data";
 import { loadPlatformSettings } from "@/lib/platform-store";
 import { isLayoutKey, resolveLayout } from "@/lib/storefront-layouts";
+import { DocTitle } from "@/components/DocTitle";
+import { titreVitrine } from "@/lib/i18n/titres";
 
 // Vitrine publique partageable : pasrel.ht/b/<slug>
 // Page d'atterrissage des pubs TikTok / Instagram / Facebook.
@@ -23,7 +25,13 @@ export default async function StorefrontPage({
   const { designs } = await loadPlatformSettings();
   const layout = preview ?? resolveLayout(data.business.layout, data.business.plan, designs);
 
-  return <Storefront business={data.business} products={data.products} layout={layout} preview={!!preview} />;
+  return (
+    <>
+      {/* Le nom du commerce ne se traduit pas ; la promesse qui le suit, si. */}
+      <DocTitle titres={titreVitrine(data.business.name)} />
+      <Storefront business={data.business} products={data.products} layout={layout} preview={!!preview} />
+    </>
+  );
 }
 
 // SEO / partage social (Open Graph) — pour que le lien soit joli dans les pubs.

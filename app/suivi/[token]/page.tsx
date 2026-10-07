@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TrackingView, type TrackingData } from "@/components/TrackingView";
+import { DocTitle } from "@/components/DocTitle";
+import { TITRES } from "@/lib/i18n/titres";
 
 // Suivi public d'une commande, ouvert depuis le lien envoyé au client.
 // Le jeton est aléatoire (colonne tracking_token) : on ne peut pas deviner
@@ -33,7 +35,12 @@ export default async function TrackingPage({ params }: { params: { token: string
     items: ((o.order_items ?? []) as { qty: number; name: string }[]).map((it) => `${Number(it.qty)} × ${it.name}`),
     shop: { name: shop?.name ?? "", slug: shop?.slug ?? "", phone: shop?.phone_e164 ?? null, logo: shop?.logo_url ?? null },
   };
-  return <TrackingView data={data} />;
+  return (
+    <>
+      <DocTitle titres={TITRES.suivi} />
+      <TrackingView data={data} />
+    </>
+  );
 }
 
 export const metadata = { title: "Suivi de commande · PASRÈL", robots: { index: false, follow: false } };
