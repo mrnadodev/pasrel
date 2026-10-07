@@ -44,6 +44,23 @@ export const metadata: Metadata = {
     "Plateforme de gestion de ventes WhatsApp. Gérez vos clients, commandes et catalogue en un seul endroit.",
   manifest: "/manifest.webmanifest",
   applicationName: "PASRÈL",
+  // Le titre et la description qui accompagnent l'image d'aperçu. L'image
+  // elle-même vient de app/opengraph-image.tsx, que Next déclare tout seul.
+  openGraph: {
+    type: "website",
+    siteName: "PASRÈL",
+    locale: "fr_HT",
+    title: "PASRÈL — Vendez sur WhatsApp, sans perdre une seule commande",
+    description:
+      "Une vitrine en ligne que vous partagez d'un lien, et chaque commande suivie du premier message jusqu'au paiement encaissé.",
+    url: siteUrl,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PASRÈL — Vendez sur WhatsApp, sans perdre une seule commande",
+    description:
+      "Une vitrine en ligne que vous partagez d'un lien, et chaque commande suivie du premier message jusqu'au paiement encaissé.",
+  },
   icons: {
     icon: [{ url: "/pasrel-icon-192.png", sizes: "192x192" }],
     apple: [{ url: "/pasrel-apple.png", sizes: "180x180" }],
