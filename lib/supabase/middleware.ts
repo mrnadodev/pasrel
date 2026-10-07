@@ -41,6 +41,9 @@ export async function updateSession(request: NextRequest) {
     // Cible du lien de réinitialisation : la session n'existe pas encore quand
     // le marchand arrive ici, elle se crée à partir du jeton dans l'URL.
     path === "/nouvo-modpas" ||
+    // Même chose pour la confirmation d'adresse : sans cette ligne, le
+    // middleware renverrait vers /login avant que la page ait pu lire le jeton.
+    path === "/konfime" ||
     // Écran expliquant la suspension : il doit rester accessible.
     path === "/sispann" ||
     // Conditions et confidentialité : un visiteur doit pouvoir les lire avant

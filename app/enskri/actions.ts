@@ -155,9 +155,14 @@ export async function registerMerchant(
     if (!input.email.trim()) return { ok: false, error: "Imèl obligatwa" };
     if (input.password.length < 6) return { ok: false, error: "Modpas la twò kout (6+)" };
 
+    // Sans `emailRedirectTo`, Supabase renvoie sur sa Site URL — la page
+    // d'accueil publique. Le marchand cliquait « confirmer » et retombait sur
+    // la vitrine sans savoir si ça avait marché. /konfime pose la session puis
+    // le ramène là où son inscription s'est arrêtée.
     const { data: auth, error: aerr } = await sb.auth.signUp({
       email: input.email.trim(),
       password: input.password,
+      options: { emailRedirectTo: `${storefrontBaseUrl()}/konfime` },
     });
     if (aerr) return { ok: false, error: aerr.message };
     if (!auth.user) return { ok: false, error: "Erè pandan kreyasyon kont lan" };

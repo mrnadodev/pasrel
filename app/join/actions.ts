@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { hasSupabase } from "@/lib/data";
 import { verifyInviteToken } from "@/lib/invite";
 import { memberSeatsFor } from "@/lib/plans";
+import { storefrontBaseUrl } from "@/lib/order";
 
 export interface JoinInput {
   businessId: string;
@@ -47,9 +48,12 @@ export async function joinBusiness(input: JoinInput) {
     }
   }
 
+  // Même raison que pour l'inscription marchand : sans cette adresse de retour,
+  // l'agent qui confirme son e-mail retombe sur la vitrine publique.
   const { data: auth, error: aerr } = await sb.auth.signUp({
     email: input.email.trim(),
     password: input.password,
+    options: { emailRedirectTo: `${storefrontBaseUrl()}/konfime` },
   });
   if (aerr) return { ok: false, error: aerr.message };
   if (!auth.user) return { ok: false, error: "Erè pandan kreyasyon kont" };

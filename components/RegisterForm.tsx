@@ -11,6 +11,35 @@ import { landingCopy } from "@/lib/i18n/landing";
 import { registerMerchant, type RegisterInput, type BrouillonInscription } from "@/app/enskri/actions";
 import { Select } from "@/components/ui/Select";
 
+/**
+ * L'écran d'attente, après l'envoi du lien de confirmation.
+ *
+ * Il mentionne les indésirables en toutes lettres. Ce n'est pas une précaution
+ * de style : c'est le premier message qu'un domaine neuf envoie, et les boîtes
+ * s'en méfient tant qu'elles ne le connaissent pas. Le dire évite une
+ * inscription abandonnée pour un courriel qui est pourtant bien arrivé.
+ */
+const ATTENTE = {
+  fr: {
+    titre: "Vérifiez votre boîte mail",
+    corps: "Nous venons d'envoyer un lien de confirmation à",
+    spam: "Rien reçu ? Regardez dans vos indésirables, et marquez le message comme légitime — les prochains arriveront alors directement.",
+    bouton: "Aller à la connexion",
+  },
+  ht: {
+    titre: "Tcheke bwat imèl ou",
+    corps: "Nou fèk voye yon lyen konfimasyon nan",
+    spam: "Ou pa resevwa anyen ? Gade nan spam ou, epi make mesaj la kòm bon — konsa lòt yo ap rive dirèkteman.",
+    bouton: "Ale nan koneksyon",
+  },
+  en: {
+    titre: "Check your inbox",
+    corps: "We have just sent a confirmation link to",
+    spam: "Nothing received? Look in your spam folder and mark the message as legitimate — the next ones will then arrive directly.",
+    bouton: "Go to sign in",
+  },
+} as const;
+
 /** À quel secteur appartient ce métier ? Sert à rouvrir les deux listes au bon
  *  endroit quand on restaure une saisie. */
 function secteurDe(sousType: string): IndustrySectorKey | null {
@@ -37,7 +66,8 @@ export function RegisterForm({
 
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  /** Adresse à confirmer : tant qu'elle est posée, l'écran d'attente remplace le formulaire. */
+  const [aConfirmer, setAConfirmer] = useState<string | null>(null);
   // Le métier conservé décide des deux listes : sans ça elles rouvriraient sur
   // « commerce » et la marchande croirait sa saisie perdue.
   const secteurRepris = brouillon?.businessType ? secteurDe(brouillon.businessType) : null;
@@ -74,7 +104,6 @@ export function RegisterForm({
 
   function submit() {
     setError(null);
-    setInfo(null);
     start(async () => {
       // La langue part avec le formulaire : c'est celle du courriel de
       // bienvenue. On la lit à l'envoi, pas au montage — elle a pu changer
@@ -84,11 +113,47 @@ export function RegisterForm({
         router.push("/");
         router.refresh();
       } else if (res.needsConfirm) {
-        setInfo(res.error ?? null);
+        // Panneau plein écran, et non un bandeau en haut de la carte : le
+        // bouton est au bas d'un long formulaire, et le message s'affichait
+        // hors de l'écran. On cliquait, rien ne semblait se passer, et on
+        // repartait en croyant que l'inscription avait échoué.
+        setAConfirmer(f.email.trim());
       } else {
         setError(res.error ?? "Erreur");
       }
     });
+  }
+
+  if (aConfirmer) {
+    const c = ATTENTE[language] ?? ATTENTE.fr;
+    return (
+      <div className="flex min-h-[100dvh] flex-col bg-chat-bg md:mx-auto md:my-10 md:min-h-0 md:max-w-[480px] md:overflow-hidden md:rounded-3xl md:shadow-xl">
+        <div className="relative flex flex-col items-center gap-3 bg-brand px-6 pb-10 pt-14 text-center">
+          <div className="absolute right-4 top-4">
+            <LanguageToggle />
+          </div>
+          <CvzMark size={60} />
+          <span className="text-xl font-extrabold tracking-tight text-white">{c.titre}</span>
+        </div>
+
+        <div className="-mt-6 flex-1 rounded-t-[28px] bg-white px-6 pb-10 pt-7">
+          <div className="flex flex-col gap-5">
+            <p className="text-[15px] leading-relaxed text-ink">
+              {c.corps} <span className="font-bold text-ink">{aConfirmer}</span>
+            </p>
+            <div className="rounded-xl bg-[#FFF6EC] px-4 py-3 text-[13px] leading-relaxed text-[#8A4607]">
+              {c.spam}
+            </div>
+            <Link
+              href="/login"
+              className="flex h-12 items-center justify-center rounded-2xl bg-brand-green text-sm font-extrabold text-white"
+            >
+              {c.bouton}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -108,7 +173,6 @@ export function RegisterForm({
 
       <div className="-mt-6 flex-1 rounded-t-[28px] bg-white px-6 pb-10 pt-7">
         {error && <div className="mb-4 rounded-xl bg-[#FCE4E4] px-4 py-3 text-[13px] font-medium text-[#C0392B]">{error}</div>}
-        {info && <div className="mb-4 rounded-xl bg-[#E7F1FB] px-4 py-3 text-[13px] font-medium text-[#1A6BB8]">{info}</div>}
 
         <div className="flex flex-col gap-4">
           <Field label={a.businessName}>
