@@ -343,6 +343,14 @@ const fr: LandingCopy = {
         q: "Dois-je changer de numéro WhatsApp ?",
         a: "Non. Les commandes arrivent sur le numéro que vous utilisez déjà, dans l'application WhatsApp que vous connaissez.",
       },
+      // La question qui décide d'une inscription. La réponse ne dit jamais
+      // « 100 % sécurisé » : aucun système ne l'est, et une promesse
+      // invérifiable se retourne au premier incident. Chaque ligne ici est un
+      // fait mesuré sur la plateforme, pas un argument.
+      {
+        q: "Est-ce que c'est sécurisé ?",
+        a: "Oui, et voici comment — pas seulement « oui ». Vous seule voyez vos clients, vos commandes et vos prix d'achat : ce n'est pas une politique écrite, c'est la base de données qui refuse les autres. Vos données sont sauvegardées automatiquement quatre fois par jour, dans un espace séparé, et la restauration a été éprouvée pour de vrai. Nous ne touchons jamais à votre argent : votre cliente vous paie directement en MonCash, NatCash, cash ou virement — nous ne gardons aucune carte et aucun solde. Et si vous arrêtez de payer un abonnement, les fonctions payantes se ferment mais vos données restent : rien n'est effacé. Aucun système n'est sans risque ; votre part est de choisir un bon mot de passe et de ne donner un compte d'équipe qu'à des personnes de confiance.",
+      },
       {
         q: "Mes clients doivent-ils installer quelque chose ?",
         a: "Non. Ils ouvrent votre lien dans leur navigateur, choisissent, et le message part vers votre WhatsApp. Aucun compte à créer.",
@@ -542,6 +550,10 @@ const ht: LandingCopy = {
         a: "Non. Kòmand yo rive sou nimewo ou deja ap sèvi a, nan menm aplikasyon WhatsApp ou konnen an.",
       },
       {
+        q: "Èske li sekirize?",
+        a: "Wi, epi men ki jan — pa jis « wi ». Sèl ou ki wè kliyan w yo, kòmand ou yo ak pri acha w yo : se pa yon règ ki ekri nan yon papye, se baz done a ki refize lòt moun yo. Done w yo sovgade otomatikman kat fwa pa jou, nan yon kote separe, epi nou deja teste remèt yo an plas — li mache. Nou pa manyen lajan w : kliyan an peye w dirèkteman an MonCash, NatCash, kach oswa vire labank — nou pa kenbe okenn kat, okenn kòb. Epi si w sispann peye yon abònman, fonksyon peyan yo fèmen men done w yo rete : anyen pa efase. Pa gen sistèm ki san risk ; pati pa w se chwazi yon bon modpas epi bay kont ekip sèlman moun ou fè konfyans.",
+      },
+      {
         q: "Èske kliyan m yo dwe enstale yon bagay?",
         a: "Non. Yo louvri lyen ou an nan navigatè yo, yo chwazi, epi mesaj la pati sou WhatsApp ou. Pa gen kont pou kreye.",
       },
@@ -738,6 +750,10 @@ const en: LandingCopy = {
       {
         q: "Do I have to change my WhatsApp number?",
         a: "No. Orders arrive on the number you already use, in the WhatsApp app you know.",
+      },
+      {
+        q: "Is it secure?",
+        a: "Yes, and here is how — not just « yes ». You alone see your customers, your orders and your purchase costs: that is not a policy written somewhere, it is the database refusing everyone else. Your data is backed up automatically four times a day, in a separate place, and the restore has been proven for real. We never touch your money: your customer pays you directly by MonCash, NatCash, cash or bank transfer — we hold no card and no balance. And if you stop paying for a plan, the paid features close but your data stays: nothing is deleted. No system is without risk; your part is to choose a strong password and to give a team account only to people you trust.",
       },
       {
         q: "Do my customers have to install anything?",
