@@ -136,13 +136,39 @@ export function buildPromoMessage(
   return `${m.promoGreeting(customerName)}\n\n${body}\n👉 ${baseUrl}/b/${slug}`;
 }
 /**
- * Base publique de la vitrine. Configurable par déploiement — sans ça, les liens
- * promo pointeraient vers un domaine codé en dur.
+ * Base publique de la plateforme : l'adresse qui part dans les liens de
+ * vitrine, les messages WhatsApp, les courriels et les retours de connexion.
+ *
+ * Elle lisait `NEXT_PUBLIC_VERCEL_URL` en second recours. Vercel expose cette
+ * variable d'office, et elle vaut l'adresse du **déploiement** —
+ * `pasrel-o1l5amsdw-….vercel.app`, différente à chaque mise en ligne. Le repli
+ * sur le domaine n'était donc jamais atteint en production, et toutes ces
+ * adresses portaient une URL éphémère.
+ *
+ * Deux conséquences mesurées. Supabase n'autorise que `pasrel.app` : il
+ * remplaçait silencieusement l'adresse de retour par la page d'accueil, donc
+ * un marchand qui réinitialisait son mot de passe atterrissait sur la vitrine
+ * publique sans explication. Et un lien de boutique envoyé à une cliente sur
+ * WhatsApp cessait de fonctionner à la mise en ligne suivante.
+ *
+ * L'adresse du déploiement n'a donc rien à faire ici : elle est juste, mais
+ * elle est temporaire, et tout ce que cette fonction produit est destiné à
+ * durer. Même règle que `adressePublique()` dans app/layout.tsx — une saisie
+ * malformée retombe sur le domaine plutôt que de se propager.
  */
 export function storefrontBaseUrl(): string {
-  const vercel = process.env.NEXT_PUBLIC_VERCEL_URL;
-  const raw = process.env.NEXT_PUBLIC_SITE_URL || (vercel ? `https://${vercel}` : "");
-  return raw.trim().replace(/\/+$/, "") || "https://pasrel.app";
+  const REPLI = "https://pasrel.app";
+  const brut = (process.env.NEXT_PUBLIC_SITE_URL ?? "")
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .replace(/\/+$/, "");
+  if (!brut) return REPLI;
+  try {
+    new URL(brut);
+    return brut;
+  } catch {
+    return REPLI;
+  }
 }
 
 /** Code de sécurité à 4 chiffres, imprévisible, tiré une seule fois à la création. */
