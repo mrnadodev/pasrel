@@ -41,7 +41,9 @@ export interface LandingCopy {
   nav: {
     product: string;
     restaurants: string;
-    /** Annuaire public : on cherche un produit, on trouve la boutique. */
+    /** Le Marketplace public : on cherche un produit, on trouve la boutique.
+     *  Le mot s'écrit pareil dans les trois langues — un terme de marque que
+     *  personne n'a à traduire, et que tout le monde reconnaît de Facebook. */
     directory: string;
     pricing: string;
     help: string;
@@ -209,7 +211,7 @@ const fr: LandingCopy = {
   nav: {
     product: "Produit",
     restaurants: "Restaurants",
-    directory: "Trouver un produit",
+    directory: "Marketplace",
     pricing: "Tarifs",
     help: "Aide",
     signIn: "Se connecter",
@@ -407,7 +409,7 @@ const ht: LandingCopy = {
   nav: {
     product: "Pwodwi",
     restaurants: "Restoran",
-    directory: "Chèche yon pwodwi",
+    directory: "Marketplace",
     pricing: "Pri",
     help: "Èd",
     signIn: "Konekte",
@@ -605,7 +607,7 @@ const en: LandingCopy = {
   nav: {
     product: "Product",
     restaurants: "Restaurants",
-    directory: "Find a product",
+    directory: "Marketplace",
     pricing: "Pricing",
     help: "Help",
     signIn: "Sign in",

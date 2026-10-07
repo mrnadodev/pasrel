@@ -18,8 +18,8 @@ import { ShopLink } from "@/components/ShopLink";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Trouver un produit — PASRÈL",
-  description: "Cherchez un produit et découvrez les boutiques qui le vendent, avec leur vitrine et leur WhatsApp.",
+  title: "Marketplace — PASRÈL",
+  description: "Le marketplace des commerces haïtiens : cherchez un produit, découvrez les boutiques qui le vendent, et écrivez-leur sur WhatsApp.",
 };
 
 export default async function AnnuairePage({ searchParams }: { searchParams?: { q?: string } }) {
@@ -39,7 +39,7 @@ export default async function AnnuairePage({ searchParams }: { searchParams?: { 
             PASRÈL
           </Link>
           <h1 className="pt-2 text-[26px] font-extrabold leading-tight tracking-tight text-white sm:text-[32px]">
-            Trouvez un produit, découvrez la boutique
+            Le marketplace des commerces haïtiens
           </h1>
           <p className="max-w-[520px] pt-2 text-[14px] leading-relaxed text-[#C4E8DD]">
             Tapez ce que vous cherchez. Nous vous disons quelles boutiques le vendent, et vous leur écrivez sur WhatsApp.

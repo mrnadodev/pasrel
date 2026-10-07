@@ -146,9 +146,9 @@ const fr: SettingsCopy = {
       hint: "Votre nom, votre logo et un lien vers votre vitrine, sur la page que voient les futurs commerçants. Rien d'autre que ce que votre vitrine montre déjà.",
     },
     directory: {
-      label: "Apparaître dans l'annuaire PASRÈL",
+      label: "Apparaître dans le Marketplace PASRÈL",
       hint: "Quand quelqu'un cherche un produit que vous vendez, votre boutique apparaît et il ouvre votre vitrine. C'est la façon d'être découvert sans être sur les réseaux sociaux.",
-      link: "Voir l'annuaire",
+      link: "Voir le Marketplace",
     },
   },
   payments: {
@@ -295,9 +295,9 @@ const ht: SettingsCopy = {
       hint: "Non w, logo w ak yon lyen sou vitrin ou, sou paj futur machann yo wè a. Anyen pase sa vitrin ou deja montre.",
     },
     directory: {
-      label: "Parèt nan anyè PASRÈL a",
+      label: "Parèt nan Marketplace PASRÈL la",
       hint: "Lè yon moun chèche yon pwodwi ou vann, boutik ou parèt epi l ouvri vitrin ou. Se konsa moun dekouvri w san w pa bezwen sou rezo sosyal yo.",
-      link: "Gade anyè a",
+      link: "Gade Marketplace la",
     },
   },
   payments: {
@@ -444,9 +444,9 @@ const en: SettingsCopy = {
       hint: "Your name, your logo and a link to your storefront, on the page future merchants see. Nothing beyond what your storefront already shows.",
     },
     directory: {
-      label: "Appear in the PASRÈL directory",
+      label: "Appear in the PASRÈL Marketplace",
       hint: "When someone searches for a product you sell, your shop shows up and they open your storefront. This is how you get found without being on social media.",
-      link: "See the directory",
+      link: "See the Marketplace",
     },
   },
   payments: {
