@@ -15,6 +15,7 @@ import { INDUSTRY_SECTORS, SECTOR_COUNT, TRADE_COUNT } from "@/lib/verticals";
 import { Wordmark } from "@/components/Wordmark";
 import { CvzMark } from "@/components/CvzMark";
 import { BackToTop } from "@/components/BackToTop";
+import { COURRIEL, COURRIEL_LIEN, WHATSAPP_AFFICHE, WHATSAPP_LIEN } from "@/lib/contact";
 
 // Ordre d'affichage des secteurs : celui de lib/verticals.ts, qui va du plus
 // courant au plus spécialisé. Rien à maintenir ici.
@@ -568,7 +569,7 @@ export function LandingPage({
               style={{ background: ACTION, color: INK, boxShadow: "0 12px 32px rgba(37,211,102,0.28)" }}>
               {c.finalCta.primary}
             </Link>
-            <a href="https://wa.me/50937124488" target="_blank" rel="noopener noreferrer"
+            <a href={WHATSAPP_LIEN} target="_blank" rel="noopener noreferrer"
               className="flex h-[58px] items-center justify-center rounded-xl border px-7 text-[16px] font-semibold text-white transition-colors hover:bg-white/10"
               style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.16)" }}>
               {c.finalCta.secondary}
@@ -596,23 +597,23 @@ export function LandingPage({
                   canal qu'elle utilise déjà, pas seulement par courriel. */}
               <div className="flex flex-col gap-2 pt-1">
                 <a
-                  href="https://wa.me/50958178844"
+                  href={WHATSAPP_LIEN}
                   className="flex items-center gap-2.5 text-[14px] font-semibold text-[#CFF5E7] underline-offset-4 hover:underline"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#25D366" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1 1 21 11.5z" />
                   </svg>
-                  +509 5817 8844
+                  {WHATSAPP_AFFICHE}
                 </a>
                 <a
-                  href="mailto:contact@pasrel.app"
+                  href={COURRIEL_LIEN}
                   className="flex items-center gap-2.5 text-[14px] text-[#7D9A92] underline-offset-4 hover:text-white hover:underline"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <rect x="3" y="5" width="18" height="14" rx="2.5" />
                     <path d="m3.5 7 8.5 6 8.5-6" />
                   </svg>
-                  contact@pasrel.app
+                  {COURRIEL}
                 </a>
               </div>
             </div>
