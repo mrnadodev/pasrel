@@ -590,6 +590,31 @@ export function LandingPage({
                 <Wordmark tone="onDark" className="text-[16.5px] font-extrabold tracking-tight text-white" />
               </div>
               <span className="max-w-[290px] text-[14px] leading-[1.62] text-[#7D9A92]">{c.footer.tagline}</span>
+
+              {/* Comment nous joindre. Un produit qui demande à une marchande de
+                  confier ses commandes doit afficher où l'on écrit — et sur le
+                  canal qu'elle utilise déjà, pas seulement par courriel. */}
+              <div className="flex flex-col gap-2 pt-1">
+                <a
+                  href="https://wa.me/50958178844"
+                  className="flex items-center gap-2.5 text-[14px] font-semibold text-[#CFF5E7] underline-offset-4 hover:underline"
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#25D366" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1 1 21 11.5z" />
+                  </svg>
+                  +509 5817 8844
+                </a>
+                <a
+                  href="mailto:contact@pasrel.app"
+                  className="flex items-center gap-2.5 text-[14px] text-[#7D9A92] underline-offset-4 hover:text-white hover:underline"
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2.5" />
+                    <path d="m3.5 7 8.5 6 8.5-6" />
+                  </svg>
+                  contact@pasrel.app
+                </a>
+              </div>
             </div>
             <FooterCol title={c.footer.productCol} links={c.footer.productLinks} />
             <FooterCol
