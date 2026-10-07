@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { PWARegister } from "@/components/PWARegister";
+import { AuthNotice } from "@/components/AuthNotice";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/components/LanguageContext";
 
@@ -72,6 +73,7 @@ export default function RootLayout({
         <LanguageProvider>
           <ThemeProvider>
             <div className="app-shell">{children}</div>
+            <AuthNotice />
             <PWARegister />
           </ThemeProvider>
         </LanguageProvider>
