@@ -60,6 +60,39 @@ export default async function AnnuairePage({ searchParams }: { searchParams?: { 
         </div>
       </header>
 
+      {/* Avertissement d'achat, à l'entrée du Marketplace.
+          Il est ici et nulle part ailleurs — surtout pas sur la vitrine d'un
+          marchand, où « méfiez-vous » se lirait comme un soupçon jeté sur lui.
+          Sur le Marketplace, terrain neutre où l'on découvre une boutique
+          qu'on ne connaît pas, c'est un conseil.
+          Un marketplace jeune se juge sur ce qu'il dit AVANT le premier
+          problème, pas sur la façon dont il s'excuse après. */}
+      <div className="mx-auto w-full max-w-[900px] px-5 pt-6">
+        <div className="flex items-start gap-3 rounded-2xl bg-[#FFF6EC] px-4 py-3.5">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#8A4607"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="mt-0.5 shrink-0"
+          >
+            <path d="M12 3.5 2.5 20h19L12 3.5z" />
+            <path d="M12 10v4" />
+            <path d="M12 17.2v.3" />
+          </svg>
+          <p className="text-[13px] leading-relaxed text-[#6B4420]">
+            <strong className="font-extrabold text-[#8A4607]">Première commande dans une boutique ?</strong>{" "}
+            Payez à la livraison, quand la marchandise est entre vos mains. N&apos;envoyez pas d&apos;argent
+            d&apos;avance à une boutique avec qui vous n&apos;avez jamais traité.
+          </p>
+        </div>
+      </div>
+
       <div className="mx-auto w-full max-w-[900px] px-5 py-6">
         {!prete ? (
           <p className="rounded-2xl border border-line bg-white p-6 text-center text-[13px] text-ink-muted">
