@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { courrielAbonnement, courrielBienvenue } from "./i18n/mail";
+import { adresseLivrable } from "./mail-adresse";
 
 // Un gabarit de courriel se teste comme du code : il porte des promesses
 // contractuelles — trois jours de tolérance, aucun prélèvement automatique — et
@@ -103,6 +104,41 @@ describe("courriel d'abonnement", () => {
     expect(courrielAbonnement("fr", donnees).text).toMatch(/jours restants s'ajoutent/i);
     expect(courrielAbonnement("ht", donnees).text).toMatch(/jou ki rete yo ajoute/i);
     expect(courrielAbonnement("en", donnees).text).toMatch(/remaining days are added/i);
+  });
+});
+
+// Supabase a averti la préproduction après quelques inscriptions d'essai
+// envoyées à des adresses inventées : trop de rebonds et le droit d'envoyer
+// est suspendu, ce qui couperait aussi les vrais courriels de mot de passe.
+describe("adresses qui ne peuvent rien recevoir", () => {
+  it("refuse les domaines réservés aux exemples et aux essais", () => {
+    for (const a of [
+      "andro@example.test",
+      "qa@pasrel.invalid",
+      "quelqun@example.com",
+      "moi@machine.localhost",
+      "agent@boutique.local",
+    ]) {
+      expect(adresseLivrable(a), a).toBe(false);
+    }
+  });
+
+  it("laisse passer les vraies adresses", () => {
+    for (const a of [
+      "contact@pasrel.app",
+      "mrnado.dev@gmail.com",
+      "boutique@exemple-reel.ht",
+      "vendeur+qa@gmail.com",
+    ]) {
+      expect(adresseLivrable(a), a).toBe(true);
+    }
+  });
+
+  it("ne se laisse pas tromper par un domaine qui contient seulement le mot", () => {
+    // « test » au milieu du nom n'en fait pas un domaine réservé : seule la
+    // terminaison compte.
+    expect(adresseLivrable("a@testament.ht")).toBe(true);
+    expect(adresseLivrable("a@example.test")).toBe(false);
   });
 });
 

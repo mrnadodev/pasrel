@@ -1,4 +1,5 @@
 import "server-only";
+import { adresseLivrable } from "@/lib/mail-adresse";
 
 /**
  * Envoi de courrier applicatif.
@@ -51,6 +52,9 @@ export async function envoyerCourriel(courriel: Courriel): Promise<ResultatEnvoi
   const cle = (process.env.RESEND_API_KEY ?? "").trim();
   if (!cle) return { etat: "saute", raison: "RESEND_API_KEY absente" };
   if (!courriel.to.includes("@")) return { etat: "saute", raison: "destinataire sans adresse" };
+  if (!adresseLivrable(courriel.to)) {
+    return { etat: "saute", raison: `domaine réservé, non livrable : ${courriel.to.split("@")[1]}` };
+  }
 
   try {
     const r = await fetch(RESEND, {
