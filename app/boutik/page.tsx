@@ -5,8 +5,9 @@ import { formatMoney } from "@/lib/money";
 import { BackToTop } from "@/components/BackToTop";
 import { Audience } from "@/components/Audience";
 import { ShopLink } from "@/components/ShopLink";
+import { MarketplaceNotice } from "@/components/MarketplaceNotice";
 
-// Annuaire public des boutiques PASRÈL.
+// Le Marketplace public de PASRÈL.
 //
 // PASRÈL donnait à chaque marchand un lien à partager, mais ne l'exposait
 // nulle part : celui qui n'est pas sur Facebook n'était découvert par personne.
@@ -19,7 +20,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Marketplace — PASRÈL",
-  description: "Le marketplace des commerces haïtiens : cherchez un produit, découvrez les boutiques qui le vendent, et écrivez-leur sur WhatsApp.",
+  description: "Le marketplace haïtien : cherchez un produit ou un service, découvrez qui le propose, et écrivez-lui sur WhatsApp.",
 };
 
 export default async function AnnuairePage({ searchParams }: { searchParams?: { q?: string } }) {
@@ -39,7 +40,7 @@ export default async function AnnuairePage({ searchParams }: { searchParams?: { 
             PASRÈL
           </Link>
           <h1 className="pt-2 text-[26px] font-extrabold leading-tight tracking-tight text-white sm:text-[32px]">
-            Le marketplace des commerces haïtiens
+            Le marketplace haïtien
           </h1>
           <p className="max-w-[520px] pt-2 text-[14px] leading-relaxed text-[#C4E8DD]">
             Tapez ce que vous cherchez. Nous vous disons quelles boutiques le vendent, et vous leur écrivez sur WhatsApp.
@@ -60,38 +61,10 @@ export default async function AnnuairePage({ searchParams }: { searchParams?: { 
         </div>
       </header>
 
-      {/* Avertissement d'achat, à l'entrée du Marketplace.
-          Il est ici et nulle part ailleurs — surtout pas sur la vitrine d'un
-          marchand, où « méfiez-vous » se lirait comme un soupçon jeté sur lui.
-          Sur le Marketplace, terrain neutre où l'on découvre une boutique
-          qu'on ne connaît pas, c'est un conseil.
-          Un marketplace jeune se juge sur ce qu'il dit AVANT le premier
-          problème, pas sur la façon dont il s'excuse après. */}
-      <div className="mx-auto w-full max-w-[900px] px-5 pt-6">
-        <div className="flex items-start gap-3 rounded-2xl bg-[#FFF6EC] px-4 py-3.5">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#8A4607"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="mt-0.5 shrink-0"
-          >
-            <path d="M12 3.5 2.5 20h19L12 3.5z" />
-            <path d="M12 10v4" />
-            <path d="M12 17.2v.3" />
-          </svg>
-          <p className="text-[13px] leading-relaxed text-[#6B4420]">
-            <strong className="font-extrabold text-[#8A4607]">Première commande dans une boutique ?</strong>{" "}
-            Payez à la livraison, quand la marchandise est entre vos mains. N&apos;envoyez pas d&apos;argent
-            d&apos;avance à une boutique avec qui vous n&apos;avez jamais traité.
-          </p>
-        </div>
-      </div>
+      {/* Avertissement d'achat. Le texte suit la langue du lecteur, donc il
+          vit dans un composant client : cette page est rendue par le serveur
+          et ne sait pas en quelle langue on la lit. */}
+      <MarketplaceNotice />
 
       <div className="mx-auto w-full max-w-[900px] px-5 py-6">
         {!prete ? (
