@@ -57,6 +57,12 @@ export async function updateSession(request: NextRequest) {
     // Suivi de commande envoyé au client, qui n'a pas de compte.
     path.startsWith("/suivi/") ||
     path.startsWith("/api") ||
+    // Images d'aperçu de lien. Elles n'ont pas d'extension, donc le filtre du
+    // middleware ne les écarte pas, et un robot d'aperçu n'a évidemment aucune
+    // session : elles repartaient vers /login, et WhatsApp recevait la page de
+    // connexion en HTML au lieu d'une image.
+    path === "/opengraph-image" ||
+    path === "/twitter-image" ||
     path.startsWith("/manifest") ||
     path === "/sw.js" ||
     path === "/icon.svg" ||
