@@ -13,6 +13,7 @@ import { paletteOfTheme, themeOf } from "@/lib/themes";
 import type { Business, Product } from "@/lib/types";
 import { createStorefrontOrderAction } from "@/app/p/actions";
 import { DEFAULT_LAYOUT, type LayoutKey } from "@/lib/storefront-layouts";
+import { InviteCreer } from "@/components/storefront/InviteCreer";
 import { FoodCard, GridCard, MenuRow } from "@/components/storefront/cards";
 import {
   BagIcon,
@@ -622,6 +623,13 @@ export function Storefront({
           </a>
         )}
       </div>
+
+      {/* Invitation à créer sa propre vitrine.
+          Elle vient après le bouton de commande, jamais avant : la page
+          appartient au marchand, et on ne lui prend pas l'attention qu'il a
+          gagnée. Masquée en aperçu — c'est le marchand qui regarde sa propre
+          vitrine, l'inviter à en créer une serait absurde. */}
+      {!preview && <InviteCreer dark={darkMode} />}
 
       {/* Accusé de réception.
           Il passe devant tout le reste : c'est la seule chose que le client

@@ -7,6 +7,7 @@ import type { LayoutKey } from "@/lib/storefront-layouts";
 import type { Product } from "@/lib/types";
 import { LanguageProvider } from "@/components/LanguageContext";
 import { FeaturedSection } from "@/components/storefront/designs";
+import { InviteCreer, TEXTE_INVITE } from "@/components/storefront/InviteCreer";
 
 // La section « À la une » existe en trois designs par secteur, soit une
 // trentaine de mises en page. Une correction appliquée à une seule d'entre
@@ -343,5 +344,54 @@ describe("le prix barre apparait sur toutes les vitrines", () => {
   it("le prix barre est etiquete pour les lecteurs d ecran", () => {
     // Sans etiquette, un lecteur d ecran annonce deux prix a payer.
     expect(rendre(enPromo, "commerce_vente", "design1")).toContain("Ancien prix");
+  });
+});
+
+describe("invitation a creer sa propre vitrine", () => {
+  const rendu = (dark?: boolean) =>
+    renderToStaticMarkup(
+      <LanguageProvider>
+        <InviteCreer dark={dark} />
+      </LanguageProvider>,
+    );
+
+  it("renvoie sur PASREL, et nulle part ailleurs", () => {
+    const html = rendu();
+    expect(html).toContain('href="/"');
+    expect(html).toContain("Vous vendez aussi");
+    expect(html).toContain("Créer ma vitrine gratuitement");
+  });
+
+  it("se lit aussi sur une vitrine en mode sombre", () => {
+    // Le meme encadre sur fond clair serait illisible : chaque couleur a sa
+    // variante, et le texte ne doit pas rester en gris fonce sur fond fonce.
+    expect(rendu(true)).toContain("#0F2A22");
+    expect(rendu(false)).toContain("#F2F6F4");
+  });
+
+  it("existe dans les trois langues, sans trou", () => {
+    for (const langue of ["fr", "ht", "en"] as const) {
+      const t = TEXTE_INVITE[langue];
+      for (const [champ, valeur] of Object.entries(t)) {
+        expect(valeur.trim(), `${langue}.${champ}`).not.toBe("");
+      }
+    }
+    expect(TEXTE_INVITE.ht.question).toContain("Ou menm tou w ap vann");
+    expect(TEXTE_INVITE.en.question).toContain("Do you sell too");
+  });
+
+  // Celui qui lit cette invitation peut tenir un restaurant, un atelier, ou
+  // vendre son temps. « Boutique » le laisserait croire que ce n'est pas pour
+  // lui — c'est la meme regle que pour l'avertissement aux acheteurs. On
+  // mesure la copie affichee, pas le fichier : le commentaire qui enonce la
+  // regle contient forcement le mot.
+  it("ne dit jamais « boutique »", () => {
+    for (const langue of ["fr", "ht", "en"] as const) {
+      for (const [champ, valeur] of Object.entries(TEXTE_INVITE[langue])) {
+        const bas = valeur.toLowerCase();
+        expect(bas, `${langue}.${champ}`).not.toContain("boutique");
+        expect(bas, `${langue}.${champ}`).not.toContain("boutik");
+      }
+    }
   });
 });

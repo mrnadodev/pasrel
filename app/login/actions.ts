@@ -142,6 +142,12 @@ export async function requestPasswordReset(
   const admin = createAdminClient();
 
   if (admin) {
+    // La fenêtre est calculée avec l'horloge de l'application, et la ligne est
+    // horodatée avec la même — `logAdminAction` écrit `created_at` lui-même.
+    // Ce détail porte tout le verrou : laisser la base poser l'horodatage
+    // ferait comparer deux horloges différentes, et il suffit de quelques
+    // secondes d'écart pour que la fenêtre ne trouve jamais rien. Mesuré sur
+    // cette machine, où l'écart est de trois minutes.
     const depuis = new Date(Date.now() - DELAI_DEMANDE_MS).toISOString();
     const { data: recentes } = await admin
       .from("security_audit_logs")
