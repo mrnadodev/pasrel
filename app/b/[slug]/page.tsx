@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { Storefront } from "@/components/Storefront";
 import { getStorefront } from "@/lib/data";
@@ -29,7 +30,18 @@ export default async function StorefrontPage({
     <>
       {/* Le nom du commerce ne se traduit pas ; la promesse qui le suit, si. */}
       <DocTitle titres={titreVitrine(data.business.name)} />
-      <Storefront business={data.business} products={data.products} layout={layout} preview={!!preview} />
+      {/* `mesurer` dit si l'ouverture compte dans l'audience du marchand.
+          Le cookie de rôle n'est pas une preuve d'identité — il ne sert à
+          rien d'autre ici qu'à ne pas compter quelqu'un de connecté, et
+          c'est exactement ce qu'on veut : un marchand qui regarde sa propre
+          vitrine ne doit pas être le premier visiteur qu'il voit. */}
+      <Storefront
+        business={data.business}
+        products={data.products}
+        layout={layout}
+        preview={!!preview}
+        mesurer={!cookies().get("pasrel_role")}
+      />
     </>
   );
 }

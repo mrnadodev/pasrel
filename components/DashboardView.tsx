@@ -207,6 +207,16 @@ function StoreActions({ slug, canMakePoster, onPoster, onReel }: { slug: string;
         <EyeIcon />
         <span>{d.actions.viewStore}</span>
       </a>
+      {/* L'audience vit à côté du partage, pas dans un recoin des réglages :
+          la question « est-ce que mon lien sert à quelque chose ? » vient
+          juste après l'avoir partagé. */}
+      <Link
+        href="/odyans"
+        className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-white px-4 text-sm font-bold text-ink active:scale-[0.99]"
+      >
+        <AudienceIcon />
+        <span>{d.actions.audience}</span>
+      </Link>
       {canMakePoster && (
         <button
           type="button"
@@ -869,6 +879,14 @@ function EyeIcon() {
   return (
     <svg {...svgProps(18, "#008069")}>
       <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+/** Trois barres qui montent : l'audience de la vitrine. */
+function AudienceIcon() {
+  return (
+    <svg {...svgProps(18, "#008069")}>
+      <path d="M6 20v-6" /><path d="M12 20V7" /><path d="M18 20v-9" />
     </svg>
   );
 }

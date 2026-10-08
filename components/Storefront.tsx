@@ -14,6 +14,7 @@ import type { Business, Product } from "@/lib/types";
 import { createStorefrontOrderAction } from "@/app/p/actions";
 import { DEFAULT_LAYOUT, type LayoutKey } from "@/lib/storefront-layouts";
 import { InviteCreer } from "@/components/storefront/InviteCreer";
+import { useCompteurVue } from "@/components/storefront/useCompteurVue";
 import { FoodCard, GridCard, MenuRow } from "@/components/storefront/cards";
 import {
   BagIcon,
@@ -50,6 +51,7 @@ export function Storefront({
   view = "vitrine",
   layout = DEFAULT_LAYOUT,
   preview = false,
+  mesurer = false,
 }: {
   business: Business;
   products: Product[];
@@ -58,6 +60,12 @@ export function Storefront({
   layout?: LayoutKey;
   /** Aperçu d'une disposition non enregistrée, depuis les réglages ou la console. */
   preview?: boolean;
+  /**
+   * Vrai seulement pour une vraie visite. Un aperçu ne compte pas, et un
+   * marchand connecté qui regarde sa propre vitrine non plus : sinon le
+   * premier chiffre qu'il voit est le sien.
+   */
+  mesurer?: boolean;
 }) {
   const c = useCopy();
   const { language } = useLanguage();
@@ -68,6 +76,10 @@ export function Storefront({
   const palette = paletteOfTheme(business.theme, vertical.id);
   const { theme: globalTheme, toggleTheme } = useTheme();
   const darkMode = globalTheme === "dark";
+
+  // Compté depuis le navigateur, jamais au rendu : un robot d'aperçu charge
+  // la page et n'exécute pas de script. Voir useCompteurVue.
+  useCompteurVue({ businessId: business.id, slug: business.slug, mesurer: mesurer && !preview });
   const [cart, setCart] = useState<Record<string, number>>({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [zoneIdx, setZoneIdx] = useState(0);

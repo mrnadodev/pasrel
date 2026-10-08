@@ -2,7 +2,7 @@
 -- PASRÈL — montage complet d'une base neuve
 --
 -- GÉNÉRÉ par scripts/build-staging-sql.mjs — ne pas modifier à la main.
--- Source : les 18 fichiers de db/, dans l'ordre de montage.
+-- Source : les 19 fichiers de db/, dans l'ordre de montage.
 --
 -- À coller dans l'éditeur SQL d'un projet Supabase VIDE.
 -- Ne jamais lancer sur la production : le script recrée tout.
@@ -12,7 +12,7 @@
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 1 / 18 — schema.sql
+-- ÉTAPE 1 / 19 — schema.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -364,7 +364,7 @@ create policy biz_isolation on order_items
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 2 / 18 — migrate-2026-1-enums.sql
+-- ÉTAPE 2 / 19 — migrate-2026-1-enums.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -414,7 +414,7 @@ alter type pay_method add value if not exists 'banque_locale';
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 3 / 18 — migrate-2026-2-schema.sql
+-- ÉTAPE 3 / 19 — migrate-2026-2-schema.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -743,7 +743,7 @@ $$;
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 4 / 18 — migrate-2026-3-admin.sql
+-- ÉTAPE 4 / 19 — migrate-2026-3-admin.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -828,7 +828,7 @@ revoke all on security_audit_logs from anon, authenticated;
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 5 / 18 — migrate-2026-4-numero.sql
+-- ÉTAPE 5 / 19 — migrate-2026-4-numero.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -969,7 +969,7 @@ on conflict (id) do update set public = false;
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 6 / 18 — migrate-2026-5-stock.sql
+-- ÉTAPE 6 / 19 — migrate-2026-5-stock.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1200,7 +1200,7 @@ create trigger products_stock_log
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 7 / 18 — migrate-2026-5b-correctif-stock.sql
+-- ÉTAPE 7 / 19 — migrate-2026-5b-correctif-stock.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1281,7 +1281,7 @@ revoke all on function apply_stock_movement(uuid, uuid, text, numeric, uuid, tex
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 8 / 18 — migrate-2026-6-gestion.sql
+-- ÉTAPE 8 / 19 — migrate-2026-6-gestion.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1521,7 +1521,7 @@ create policy purchase_items_read on purchase_items for select to authenticated
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 9 / 18 — migrate-2026-7-support.sql
+-- ÉTAPE 9 / 19 — migrate-2026-7-support.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1624,7 +1624,7 @@ revoke all on app_errors from anon, authenticated;
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 10 / 18 — migrate-2026-8-abonnement.sql
+-- ÉTAPE 10 / 19 — migrate-2026-8-abonnement.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1681,7 +1681,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 11 / 18 — migrate-2026-9-vitrine-accueil.sql
+-- ÉTAPE 11 / 19 — migrate-2026-9-vitrine-accueil.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1738,7 +1738,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 12 / 18 — migrate-2026-10-vitrine-produits.sql
+-- ÉTAPE 12 / 19 — migrate-2026-10-vitrine-produits.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1772,7 +1772,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 13 / 18 — migrate-2026-11-annuaire.sql
+-- ÉTAPE 13 / 19 — migrate-2026-11-annuaire.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1898,7 +1898,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 14 / 18 — migrate-2026-12-horaires.sql
+-- ÉTAPE 14 / 19 — migrate-2026-12-horaires.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -1968,7 +1968,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 15 / 18 — migrate-2026-13-audience.sql
+-- ÉTAPE 15 / 19 — migrate-2026-13-audience.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -2030,7 +2030,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 16 / 18 — migrate-2026-14-taille.sql
+-- ÉTAPE 16 / 19 — migrate-2026-14-taille.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -2064,7 +2064,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 17 / 18 — migrate-2026-15-promo.sql
+-- ÉTAPE 17 / 19 — migrate-2026-15-promo.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -2124,7 +2124,7 @@ on conflict (key) do update
 
 
 -- ══════════════════════════════════════════════════════════
--- ÉTAPE 18 / 18 — migrate-2026-16-exposition.sql
+-- ÉTAPE 18 / 19 — migrate-2026-16-exposition.sql
 -- ══════════════════════════════════════════════════════════
 
 -- ============================================================
@@ -2218,6 +2218,77 @@ insert into platform_settings (key, value)
 values ('db_version', jsonb_build_object('migration', 16))
 on conflict (key) do update
   set value = jsonb_build_object('migration', greatest(16, coalesce((platform_settings.value->>'migration')::int, 0))),
+      updated_at = now();
+
+-- ✅ Migration terminée.
+
+
+-- ══════════════════════════════════════════════════════════
+-- ÉTAPE 19 / 19 — migrate-2026-17-odyans-vitrin.sql
+-- ══════════════════════════════════════════════════════════
+
+-- ============================================================
+-- Migration 17 — le marchand voit enfin l'audience de sa vitrine
+--
+-- À exécuter dans l'éditeur SQL Supabase, après migrate-2026-16-exposition.sql.
+-- À passer APRÈS le déploiement du code correspondant : l'application sait
+-- vivre sans ces colonnes — elle avale en silence une écriture refusée — et
+-- l'inverse n'est pas vrai.
+--
+-- Ce qui manquait.
+--
+-- `site_events` comptait déjà les clics venus du Marketplace (`shop_click`,
+-- posé au moment du clic, avant la navigation). Mais une vitrine ouverte
+-- depuis un lien partagé sur WhatsApp ne laissait AUCUNE trace : le marchand
+-- qui collait son lien dans son statut n'avait pas le moindre moyen de savoir
+-- si quelqu'un l'avait ouvert. C'est pourtant le geste central du produit.
+--
+-- Deux ajouts, et rien de plus :
+--
+--   1. un type d'évènement `shop_view` — une vitrine ouverte, quelle que soit
+--      la porte d'entrée. Il ne remplace pas `shop_click` : celui-ci mesure
+--      l'intention depuis l'annuaire, et son historique reste intact.
+--
+--   2. une colonne `source` — par où la personne est arrivée. Elle vaut
+--      « marketplace » quand le référent est notre propre annuaire, « lien »
+--      dans tous les autres cas : WhatsApp, un statut, une bio, une adresse
+--      tapée à la main.
+--
+-- Ce qui n'est PAS collecté, et ne le sera pas : aucune adresse IP, aucun
+-- identifiant de visiteur, aucun cookie. On compte des ouvertures, et c'est
+-- tout. La politique de confidentialité le dit dans les mêmes termes.
+-- ============================================================
+
+-- 1. Le nouveau type d'évènement.
+--    La contrainte est posée sur la colonne à la création de la table, donc
+--    Postgres l'a nommée `site_events_kind_check`. On la remplace.
+alter table site_events drop constraint if exists site_events_kind_check;
+alter table site_events add constraint site_events_kind_check
+  check (kind in ('visit', 'search', 'shop_click', 'shop_view'));
+
+-- 2. La porte d'entrée.
+alter table site_events add column if not exists source text;
+alter table site_events drop constraint if exists site_events_source_check;
+alter table site_events add constraint site_events_source_check
+  check (source is null or source in ('marketplace', 'lien'));
+
+-- 3. La lecture du marchand : « mes ouvertures, les plus récentes d'abord ».
+--    Sans cet index, chaque ouverture de la page d'audience balaie toute la
+--    table — qui ne fait que grossir.
+create index if not exists site_events_business_idx
+  on site_events (business_id, created_at desc)
+  where business_id is not null;
+
+-- La table reste fermée à anon et authenticated : la page d'audience lit par
+-- la clé service role, après avoir vérifié que le commerce est bien celui du
+-- membre connecté. Un marchand ne doit pas pouvoir lire l'audience d'un autre.
+revoke all on site_events from anon, authenticated;
+
+-- Repère de version lu par la console.
+insert into platform_settings (key, value)
+values ('db_version', jsonb_build_object('migration', 17))
+on conflict (key) do update
+  set value = jsonb_build_object('migration', greatest(17, coalesce((platform_settings.value->>'migration')::int, 0))),
       updated_at = now();
 
 -- ✅ Migration terminée.

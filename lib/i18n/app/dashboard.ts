@@ -58,6 +58,8 @@ export interface DashboardCopy {
     shareTitle: string;
     shareText: string;
     viewStore: string;
+    /** Vers la page d audience de la vitrine. */
+    audience: string;
     poster: string;
     /** Diaporama video des produits, a cote de l affiche fixe. */
     reel: string;
@@ -143,6 +145,7 @@ const fr: DashboardCopy = {
     shareTitle: "Commander sur WhatsApp",
     shareText: "Découvrez notre catalogue et commandez facilement sur WhatsApp :",
     viewStore: "Voir ma vitrine",
+    audience: "Audience",
     poster: "Créer une affiche",
     reel: "Créer une vidéo",
   },
@@ -267,6 +270,7 @@ const ht: DashboardCopy = {
     shareTitle: "Kòmande sou WhatsApp",
     shareText: "Gade katalòg nou an epi kòmande fasil sou WhatsApp :",
     viewStore: "Gade vitrin mwen",
+    audience: "Odyans",
     poster: "Kreye yon afich",
     reel: "Kreye yon videyo",
   },
@@ -392,6 +396,7 @@ const en: DashboardCopy = {
     shareTitle: "Order on WhatsApp",
     shareText: "Browse our catalog and order easily on WhatsApp:",
     viewStore: "View my storefront",
+    audience: "Audience",
     poster: "Create a poster",
     reel: "Create a video",
   },

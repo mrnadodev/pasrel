@@ -16,7 +16,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // L'écriture est volontairement silencieuse : une mesure qui casserait la page
 // qu'elle mesure serait un mauvais échange.
 
-export type SiteEventKind = "visit" | "search" | "shop_click";
+export type SiteEventKind = "visit" | "search" | "shop_click" | "shop_view";
 
 /** Au-delà, ce n'est plus un terme de recherche mais un collage accidentel. */
 const MAX_TERM = 80;

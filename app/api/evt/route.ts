@@ -14,7 +14,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // Rien de personnel n'entre ici : pas d'adresse IP, pas de cookie, pas
 // d'identifiant de visiteur. On compte des évènements.
 
-const KINDS = ["visit", "search", "shop_click"] as const;
+const KINDS = ["visit", "search", "shop_click", "shop_view"] as const;
+/** Par ou la personne est arrivee sur la vitrine. Rien dautre nest accepte. */
+const SOURCES = ["marketplace", "lien"] as const;
 const MAX_TERM = 80;
 const MAX_PATH = 200;
 /** Un identifiant de boutique, ou rien. Tout le reste est écarté. */
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
     return ok();
   }
 
-  const p = corps as { kind?: string; path?: string; term?: string; businessId?: string };
+  const p = corps as { kind?: string; path?: string; term?: string; businessId?: string; source?: string };
   const kind = KINDS.find((k) => k === p.kind);
   if (!kind) return ok();
 
@@ -45,6 +47,7 @@ export async function POST(request: Request) {
     path: typeof p.path === "string" ? p.path.trim().slice(0, MAX_PATH) || null : null,
     term: kind === "search" && typeof p.term === "string" ? p.term.trim().toLowerCase().slice(0, MAX_TERM) || null : null,
     business_id: typeof p.businessId === "string" && UUID.test(p.businessId) ? p.businessId : null,
+    source: kind === "shop_view" ? (SOURCES.find((s) => s === p.source) ?? "lien") : null,
   });
 
   return ok();
