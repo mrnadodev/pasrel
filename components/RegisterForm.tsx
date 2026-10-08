@@ -32,7 +32,11 @@ const ATTENTE = {
     spam: "Rien reçu ? Regardez dans vos indésirables, et marquez le message comme légitime — les prochains arriveront alors directement.",
     renvoyer: "Renvoyer le lien",
     renvoiEnCours: "Envoi…",
-    renvoye: "Lien renvoyé. Regardez aussi dans les indésirables.",
+    // Supabase répond pareil que l'adresse existe ou non — c'est voulu, pour
+    // qu'on ne puisse pas deviner quels comptes existent. On ne peut donc pas
+    // dire laquelle des deux situations c'est : on donne les deux portes.
+    renvoye:
+      "Si rien n'arrive, c'est probablement que ce compte existe déjà et qu'il est confirmé. Dans ce cas aucun nouveau message n'est envoyé — connectez-vous pour terminer.",
     dejaConfirme:
       "Ce compte est déjà confirmé — c'est pour cela qu'aucun message n'arrive. Connectez-vous pour terminer la création de votre commerce.",
     tropSouvent: "Trop de demandes d'affilée. Réessayez dans quelques minutes.",
@@ -44,7 +48,8 @@ const ATTENTE = {
     spam: "Ou pa resevwa anyen ? Gade nan spam ou, epi make mesaj la kòm bon — konsa lòt yo ap rive dirèkteman.",
     renvoyer: "Voye lyen an ankò",
     renvoiEnCours: "N ap voye…",
-    renvoye: "Nou voye lyen an ankò. Gade nan spam ou tou.",
+    renvoye:
+      "Si anyen pa rive, se pwobableman paske kont sa a deja egziste e li deja konfime. Nan ka sa a pa gen okenn nouvo mesaj k ap voye — konekte pou w fini.",
     dejaConfirme:
       "Kont sa a deja konfime — se poutèt sa okenn mesaj pa rive. Konekte pou w fini kreye biznis ou.",
     tropSouvent: "Twòp demann youn dèyè lòt. Eseye ankò nan kèk minit.",
@@ -56,7 +61,8 @@ const ATTENTE = {
     spam: "Nothing received? Look in your spam folder and mark the message as legitimate — the next ones will then arrive directly.",
     renvoyer: "Send the link again",
     renvoiEnCours: "Sending…",
-    renvoye: "Link sent again. Look in your spam folder too.",
+    renvoye:
+      "If nothing arrives, it is most likely that this account already exists and is confirmed. In that case no new message is sent — sign in to finish.",
     dejaConfirme:
       "This account is already confirmed — that is why no message arrives. Sign in to finish creating your business.",
     tropSouvent: "Too many requests in a row. Try again in a few minutes.",

@@ -114,9 +114,18 @@ function setDisplayCookies(ownerName: string) {
  * aucun courriel ne partait — Supabase n'en renvoie pas pour une adresse déjà
  * confirmée. Il attendait un message qui ne viendrait jamais.
  *
- * On ne révèle rien qu'il ne sache déjà : il vient de saisir cette adresse.
- * Lui dire « ce compte est déjà confirmé, connecte-toi » lui rend une porte,
- * là où le silence lui en fermait une.
+ * Supabase répond **200 avec un corps vide** que l'adresse existe ou non —
+ * mesuré, pas supposé. C'est délibéré : sans cela, ce formulaire dirait à
+ * n'importe qui quelles adresses ont un compte chez nous.
+ *
+ * On ne peut donc pas distinguer les deux cas, et on ne cherche pas à
+ * contourner cette protection pour une question de confort. L'écran donne les
+ * deux portes à la fois : « le lien repart » et « si rien n'arrive, c'est que
+ * ce compte existe déjà — connectez-vous ». Le marchand n'a pas besoin de
+ * savoir dans quel cas il est, il a besoin de savoir quoi faire.
+ *
+ * Les états ci-dessous couvrent quand même le cas où Supabase renverrait une
+ * erreur explicite : ce fut vrai par le passé, ça peut le redevenir.
  */
 export type ResultatRenvoi =
   | { etat: "envoye" }
