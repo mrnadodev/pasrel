@@ -124,6 +124,31 @@ export function LandingPage({
           </div>
         </header>
 
+        {/* Le Marketplace, sur téléphone.
+            La barre de navigation est masquée sous 1024 px. Les autres liens
+            n'y perdent rien — ce sont des ancres vers des sections de cette
+            page, qu'on atteint en faisant défiler. Le Marketplace, lui, est
+            une AUTRE page, et c'est la porte des acheteurs : personne arrivé
+            sur un téléphone ne pouvait y entrer depuis le haut.
+
+            Il n'a pas pu rentrer dans la barre : mesuré à 375 px, il n'y reste
+            que 52 pixels libres, et le mot en demande quatre-vingt-dix. D'où
+            cette ligne à part. Elle ne reste pas collée en haut : un en-tête
+            de deux étages mangerait un septième de l'écran pendant tout le
+            défilement. */}
+        <Link
+          href="/boutik"
+          className="relative mx-auto flex w-full max-w-[1240px] items-center gap-2.5 border-y px-5 py-3 transition-colors active:bg-white/10 sm:px-8 lg:hidden"
+          style={{ borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}
+        >
+          <MarketplaceIcon />
+          <span className="text-[14.5px] font-bold text-white">{c.nav.directory}</span>
+          <svg aria-hidden="true" className="ml-auto" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#A9C4BC" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </Link>
+
         <div className="relative mx-auto grid w-full max-w-[1240px] items-center gap-14 px-5 pb-16 pt-12 sm:px-8 lg:grid-cols-[6fr_5fr] lg:gap-16 lg:px-12 lg:pb-24 lg:pt-16">
           <div className="flex flex-col gap-7">
             <div data-reveal className="flex items-center gap-2.5 self-start rounded-full border px-4 py-2"
@@ -702,6 +727,19 @@ function Card({
         <span className="self-start rounded-md px-2 py-0.5 text-[10.5px] font-bold" style={{ background: tagBg, color: tagColor }}>{tag}</span>
       )}
     </div>
+  );
+}
+
+/** L'étal du marché : quatre cases, comme les vitrines de l'annuaire. */
+function MarketplaceIcon() {
+  return (
+    <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none"
+      stroke="#25D366" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7.5" height="7.5" rx="1.8" />
+      <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8" />
+      <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8" />
+      <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8" />
+    </svg>
   );
 }
 
