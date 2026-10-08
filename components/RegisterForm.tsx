@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { INDUSTRY_SECTORS, type IndustrySectorKey } from "@/lib/verticals";
 import { CvzMark } from "@/components/CvzMark";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { ChampModpas } from "@/components/ChampModpas";
 import { useLanguage } from "@/components/LanguageContext";
 import { landingCopy } from "@/lib/i18n/landing";
 import {
@@ -282,9 +283,16 @@ export function RegisterForm({
               <Field label={a.email}>
                 <input type="email" value={f.email} onChange={(e) => set({ email: e.target.value })} className={cls} placeholder="vous@exemple.com" autoComplete="email" />
               </Field>
-              <Field label={a.password}>
-                <input type="password" value={f.password} onChange={(e) => set({ password: e.target.value })} className={cls} placeholder="••••••••" autoComplete="new-password" />
-              </Field>
+              {/* Hors de <Field> : celui-ci enveloppe dans un <label>, et l'œil
+                  est un bouton — un bouton dans un <label> hérite de son clic. */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="modpas-enskri" className="text-[13px] font-semibold text-ink-soft">{a.password}</label>
+                <ChampModpas
+                  id="modpas-enskri"
+                  value={f.password}
+                  onChange={(password) => set({ password })}
+                />
+              </div>
             </>
           )}
 

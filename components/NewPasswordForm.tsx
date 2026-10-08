@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { requestPasswordReset } from "@/app/login/actions";
 import { lireJeton } from "@/lib/auth-lien";
+import { ChampModpas } from "@/components/ChampModpas";
 import { CvzMark } from "@/components/CvzMark";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/components/LanguageContext";
@@ -260,28 +261,17 @@ export function NewPasswordForm() {
         {(state === "ready" || state === "saving") && (
           <div className="flex flex-col gap-4">
             {error && <div className="rounded-xl bg-[#FCE4E4] px-4 py-3 text-[13px] font-medium text-[#C0392B]">{error}</div>}
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[13px] font-semibold text-ink-soft">{t.password}</span>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                placeholder="••••••••"
-                className="h-12 rounded-xl border border-line bg-[#F7F8F9] px-4 text-[15px] outline-none focus:border-brand focus:bg-white"
-              />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[13px] font-semibold text-ink-soft">{t.confirm}</span>
-              <input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                autoComplete="new-password"
-                placeholder="••••••••"
-                className="h-12 rounded-xl border border-line bg-[#F7F8F9] px-4 text-[15px] outline-none focus:border-brand focus:bg-white"
-              />
-            </label>
+            {/* Un <div> et non un <label> : l'œil est un bouton, et un bouton
+                dans un <label> hérite de son comportement de clic. Le libellé
+                garde son lien par `htmlFor`. */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="modpas" className="text-[13px] font-semibold text-ink-soft">{t.password}</label>
+              <ChampModpas id="modpas" value={password} onChange={setPassword} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="modpas-confirme" className="text-[13px] font-semibold text-ink-soft">{t.confirm}</label>
+              <ChampModpas id="modpas-confirme" value={confirm} onChange={setConfirm} />
+            </div>
             <button
               onClick={save}
               disabled={state === "saving"}

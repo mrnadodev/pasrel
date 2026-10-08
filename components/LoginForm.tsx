@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useLanguage } from "@/components/LanguageContext";
 import { landingCopy } from "@/lib/i18n/landing";
 import { requestPasswordReset } from "@/app/login/actions";
+import { ChampModpas } from "@/components/ChampModpas";
 
 const RESET_TEXT = {
   fr: {
@@ -15,8 +16,6 @@ const RESET_TEXT = {
     send: "Envoyer le lien",
     sending: "Envoi…",
     close: "Fermer",
-    show: "Afficher le mot de passe",
-    hide: "Masquer le mot de passe",
   },
   ht: {
     title: "Modpas bliye",
@@ -27,8 +26,6 @@ const RESET_TEXT = {
     send: "Voye lyen an",
     sending: "N ap voye…",
     close: "Fèmen",
-    show: "Montre modpas la",
-    hide: "Maske modpas la",
   },
   en: {
     title: "Forgot password",
@@ -39,8 +36,6 @@ const RESET_TEXT = {
     send: "Send the link",
     sending: "Sending…",
     close: "Close",
-    show: "Show password",
-    hide: "Hide password",
   },
 } as const;
 
@@ -55,7 +50,6 @@ export function LoginForm({
   const a = landingCopy(language).auth;
   const r = RESET_TEXT[language] ?? RESET_TEXT.fr;
 
-  const [showPassword, setShowPassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
@@ -99,9 +93,9 @@ export function LoginForm({
           />
         </label>
 
-        <label className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-ink-soft">{a.password}</span>
+            <label htmlFor="modpas-connexion" className="text-[13px] font-semibold text-ink-soft">{a.password}</label>
             <button
               type="button"
               onClick={() => setShowForgotModal(true)}
@@ -110,36 +104,8 @@ export function LoginForm({
               {a.forgot}
             </button>
           </div>
-          <div className="relative flex items-center">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              required
-              autoComplete="current-password"
-              placeholder="••••••••"
-              className="h-12 w-full rounded-xl border border-line bg-[#F7F8F9] pl-4 pr-11 text-[15px] outline-none focus:border-brand focus:bg-white"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 cursor-pointer p-1 text-ink-muted hover:text-ink"
-              aria-label={showPassword ? r.hide : r.show}
-              title={showPassword ? r.hide : r.show}
-            >
-              {showPassword ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </label>
+          <ChampModpas id="modpas-connexion" name="password" required autoComplete="current-password" />
+        </div>
 
         <button
           type="submit"
