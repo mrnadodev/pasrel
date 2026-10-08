@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { courrielAbonnement, courrielBienvenue } from "./i18n/mail";
+import { courrielAbonnement, courrielBienvenue, courrielModpas } from "./i18n/mail";
+import { lienJeton } from "./auth-lien";
 import { adresseLivrable } from "./mail-adresse";
 
 // Un gabarit de courriel se teste comme du code : il porte des promesses
@@ -139,6 +140,54 @@ describe("adresses qui ne peuvent rien recevoir", () => {
     // terminaison compte.
     expect(adresseLivrable("a@testament.ht")).toBe(true);
     expect(adresseLivrable("a@example.test")).toBe(false);
+  });
+});
+
+describe("courriel de mot de passe oublié", () => {
+  const lien = lienJeton(BASE, "/nouvo-modpas", "pcekBh7", "recovery");
+  const donnees = { lien, baseUrl: BASE };
+
+  it("porte le lien, en bouton et en texte copiable", () => {
+    for (const langue of ["fr", "ht", "en"] as const) {
+      const r = courrielModpas(langue, donnees);
+      expect(r.text, langue).toContain(lien);
+      expect(r.html, langue).toContain(`href="${lien}"`);
+      // Le bouton ne survit pas à tous les clients mail : l'adresse doit aussi
+      // se lire et se copier.
+      expect(r.html.split(lien).length, langue).toBeGreaterThan(2);
+    }
+  });
+
+  // La cause de la panne : un lien qui pointe sur l'API d'authentification est
+  // dépensé par le premier robot d'aperçu qui le visite.
+  it("ne pointe jamais sur /auth/v1/verify", () => {
+    for (const langue of ["fr", "ht", "en"] as const) {
+      const r = courrielModpas(langue, donnees);
+      expect(r.text, langue).not.toContain("/auth/v1/");
+      expect(r.html, langue).not.toContain("/auth/v1/");
+      expect(r.text, langue).toContain("/nouvo-modpas?token_hash=");
+    }
+  });
+
+  it("dit dans les trois langues qu'il ne sert qu'une fois et ne se transfère pas", () => {
+    const attendu = {
+      fr: ["une fois", "suivre"],
+      ht: ["yon sèl fwa", "Pa voye l"],
+      en: ["only once", "forward"],
+    } as const;
+    for (const langue of ["fr", "ht", "en"] as const) {
+      const r = courrielModpas(langue, donnees);
+      for (const mot of attendu[langue]) {
+        expect(r.text, `${langue} / ${mot}`).toContain(mot);
+        expect(r.html, `${langue} / ${mot}`).toContain(mot);
+      }
+    }
+  });
+
+  it("rassure celui qui n'a rien demandé", () => {
+    expect(courrielModpas("fr", donnees).text).toContain("Ignorez ce message");
+    expect(courrielModpas("ht", donnees).text).toContain("Pa okipe mesaj");
+    expect(courrielModpas("en", donnees).text).toContain("Ignore this message");
   });
 });
 

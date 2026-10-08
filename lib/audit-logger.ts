@@ -21,6 +21,10 @@ export interface AuditLogEntry {
     | "SUSPEND_MERCHANT"
     | "UNSUSPEND_MERCHANT"
     | "RESET_PASSWORD_LINK"
+    // Demandé par la personne elle-même depuis la page de connexion, pas par
+    // un administrateur : `adminEmail` porte alors l'adresse demandée. Cette
+    // ligne sert aussi de verrou — une demande par minute et par adresse.
+    | "PASSWORD_RESET_REQUEST"
     | "CHANGE_OWNER_EMAIL"
     | "TRANSFER_OWNERSHIP"
     | "VIEW_MERCHANT"

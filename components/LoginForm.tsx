@@ -65,7 +65,7 @@ export function LoginForm({
   function sendReset() {
     setResetError(null);
     start(async () => {
-      const res = await requestPasswordReset(resetEmail);
+      const res = await requestPasswordReset(resetEmail, language);
       if (res.ok) setResetSent(true);
       else setResetError(res.error ?? null);
     });

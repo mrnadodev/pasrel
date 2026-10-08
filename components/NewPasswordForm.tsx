@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { requestPasswordReset } from "@/app/login/actions";
+import { lireJeton } from "@/lib/auth-lien";
 import { CvzMark } from "@/components/CvzMark";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/components/LanguageContext";
@@ -16,7 +18,12 @@ const TEXT = {
     title: "Nouveau mot de passe",
     subtitle: "Choisissez un mot de passe d'au moins 6 caractères.",
     checking: "Vérification du lien…",
-    invalid: "Ce lien n'est plus valable. Demandez-en un nouveau depuis la page de connexion.",
+    invalid: "Ce lien n'est plus valable : il a déjà servi, ou il a plus d'une heure.",
+    demandeTitre: "Recevez-en un nouveau tout de suite",
+    demandeAide: "Entrez votre adresse. Le lien part directement dans votre boîte — ne le faites pas suivre à quelqu'un d'autre, il ne fonctionne qu'une fois.",
+    demandeBouton: "M'envoyer un lien",
+    demandeEnCours: "Envoi…",
+    demandeOk: "Si un compte existe à cette adresse, le lien vient d'y être envoyé. Pensez à regarder dans les indésirables.",
     password: "Nouveau mot de passe",
     confirm: "Confirmez le mot de passe",
     save: "Enregistrer",
@@ -30,7 +37,12 @@ const TEXT = {
     title: "Nouvo modpas",
     subtitle: "Chwazi yon modpas ki gen omwen 6 karaktè.",
     checking: "N ap verifye lyen an…",
-    invalid: "Lyen sa a pa valab ankò. Mande yon lòt sou paj koneksyon an.",
+    invalid: "Lyen sa a pa valab ankò : li deja sèvi, oswa li gen plis pase yon èdtan.",
+    demandeTitre: "Mande yon lòt kounye a",
+    demandeAide: "Antre adrès ou. Lyen an ap rive dirèkteman nan bwat ou — pa voye l bay yon lòt moun, li sèvi yon sèl fwa.",
+    demandeBouton: "Voye yon lyen ban mwen",
+    demandeEnCours: "N ap voye…",
+    demandeOk: "Si yon kont egziste ak adrès sa a, lyen an fèk pati. Tcheke nan spam ou tou.",
     password: "Nouvo modpas",
     confirm: "Konfime modpas la",
     save: "Anrejistre",
@@ -44,7 +56,12 @@ const TEXT = {
     title: "New password",
     subtitle: "Choose a password of at least 6 characters.",
     checking: "Checking the link…",
-    invalid: "This link is no longer valid. Request a new one from the sign-in page.",
+    invalid: "This link is no longer valid: it has already been used, or it is more than an hour old.",
+    demandeTitre: "Get a new one right now",
+    demandeAide: "Enter your address. The link goes straight to your inbox — do not forward it to anyone, it only works once.",
+    demandeBouton: "Send me a link",
+    demandeEnCours: "Sending…",
+    demandeOk: "If an account exists at this address, the link has just been sent. Remember to check your spam folder.",
     password: "New password",
     confirm: "Confirm password",
     save: "Save",
@@ -67,14 +84,26 @@ export function NewPasswordForm() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // Le jeton de récupération arrive dans l'URL. Il peut s'y trouver sous deux
-  // formes, et il faut savoir lire les deux :
+  // Demander un nouveau lien sans quitter la page. Un lien de récupération ne
+  // dure qu'une heure et ne sert qu'une fois ; renvoyer la personne vers la
+  // page de connexion pour qu'elle retrouve « Mot de passe oublié » et retape
+  // son adresse, c'est trois occasions d'abandonner.
+  const [demandeMail, setDemandeMail] = useState("");
+  const [demandeEnvoi, setDemandeEnvoi] = useState(false);
+  const [demandeFaite, setDemandeFaite] = useState(false);
+
+  // Le jeton de récupération arrive dans l'URL. Il peut s'y trouver sous trois
+  // formes, et il faut savoir lire les trois :
   //
+  //   · `?token_hash=…&type=recovery` — le jeton haché, c'est ce que nos
+  //     propres courriels envoient désormais. Rien n'est consommé avant
+  //     l'appel ci-dessous, donc aucun robot d'aperçu ne peut le dépenser
+  //     (lib/auth-lien.ts explique pourquoi ça change tout) ;
   //   · un code dans la requête (`?code=`), le flux PKCE, que le client
   //     Supabase échange tout seul au chargement ;
   //   · les jetons dans le fragment (`#access_token=…`), le flux implicite —
-  //     c'est ce que renvoie l'endpoint /verify, donc tout lien de
-  //     récupération ouvert directement.
+  //     c'est ce que renvoie l'endpoint /verify, donc tout ancien lien encore
+  //     en circulation.
   //
   // Le client navigateur de @supabase/ssr est configuré en PKCE, et dans ce
   // cas `auth-js` REFUSE un fragment implicite au lieu de le lire : il lève
@@ -85,6 +114,20 @@ export function NewPasswordForm() {
     let cancelled = false;
     let timer = 0;
     const sb = createClient();
+
+    // Vrai si la requête portait un jeton haché, qu'il ait marché ou non.
+    async function depuisLeJeton(): Promise<boolean> {
+      const j = lireJeton(window.location.search, "recovery");
+      if (!j) return false;
+
+      const { data } = await sb.auth.verifyOtp({ token_hash: j.token_hash, type: j.type });
+      // Le jeton ne doit pas rester dans la barre d'adresse : il se copie, il
+      // se partage, et il ouvre le compte.
+      window.history.replaceState(null, "", window.location.pathname);
+      if (cancelled) return true;
+      setState(data.session ? "ready" : "invalid");
+      return true;
+    }
 
     // Vrai si le fragment portait une session utilisable.
     async function depuisLeFragment(): Promise<boolean> {
@@ -117,11 +160,14 @@ export function NewPasswordForm() {
       if (session) setState((s) => (s === "checking" || s === "invalid" ? "ready" : s));
     });
 
-    // Le fragment se lit tout de suite ; sans lui, on laisse au client le temps
-    // d'échanger un code PKCE, ce qui se fait juste après le montage.
-    void depuisLeFragment().then((traite) => {
-      if (!traite && !cancelled) timer = window.setTimeout(check, 700);
-    });
+    // Le jeton haché d'abord, puis le fragment ; sans l'un ni l'autre, on
+    // laisse au client le temps d'échanger un code PKCE, ce qui se fait juste
+    // après le montage.
+    void (async () => {
+      if (await depuisLeJeton()) return;
+      if (await depuisLeFragment()) return;
+      if (!cancelled) timer = window.setTimeout(check, 700);
+    })();
 
     return () => {
       cancelled = true;
@@ -162,6 +208,40 @@ export function NewPasswordForm() {
         {state === "invalid" && (
           <div className="flex flex-col gap-4">
             <div className="rounded-xl bg-[#FCE4E4] px-4 py-3 text-[13px] font-medium text-[#C0392B]">{t.invalid}</div>
+
+            {demandeFaite ? (
+              <div className="rounded-xl bg-[#E7F7F1] px-4 py-3 text-[13px] font-medium leading-relaxed text-[#0B6B57]">
+                {t.demandeOk}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 rounded-2xl border border-line p-4">
+                <span className="text-[14px] font-extrabold text-ink">{t.demandeTitre}</span>
+                <p className="text-[12.5px] leading-relaxed text-ink-muted">{t.demandeAide}</p>
+                <input
+                  type="email"
+                  value={demandeMail}
+                  onChange={(e) => setDemandeMail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="vous@exemple.com"
+                  aria-label={t.demandeBouton}
+                  className="h-11 rounded-xl border border-line bg-[#F7F8F9] px-3.5 text-sm outline-none focus:border-brand focus:bg-white"
+                />
+                <button
+                  type="button"
+                  disabled={demandeEnvoi || !demandeMail.includes("@")}
+                  onClick={async () => {
+                    setDemandeEnvoi(true);
+                    await requestPasswordReset(demandeMail, language);
+                    setDemandeEnvoi(false);
+                    setDemandeFaite(true);
+                  }}
+                  className="h-11 cursor-pointer rounded-xl bg-brand-green text-[13.5px] font-extrabold text-white disabled:opacity-60"
+                >
+                  {demandeEnvoi ? t.demandeEnCours : t.demandeBouton}
+                </button>
+              </div>
+            )}
+
             <Link href="/login" className="flex h-12 items-center justify-center rounded-2xl bg-brand text-sm font-extrabold text-white">
               {t.backToLogin}
             </Link>

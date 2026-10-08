@@ -385,3 +385,122 @@ const ABONNEMENT: Record<Language, (d: DonneesAbonnement) => Rendu> = {
 export function courrielAbonnement(langue: Language, d: DonneesAbonnement): Rendu {
   return (ABONNEMENT[langue] ?? ABONNEMENT.fr)(d);
 }
+
+/* ──────────────────────── Mot de passe oublié ──────────────────────── */
+
+export interface DonneesModpas {
+  /** Lien vers /nouvo-modpas, portant le jeton haché. */
+  lien: string;
+  baseUrl: string;
+}
+
+/**
+ * Le courriel de réinitialisation, écrit par nous.
+ *
+ * Il l'était par Supabase, en anglais, sans marque, avec un lien qui pointait
+ * sur l'API d'authentification — donc un lien que le premier robot d'aperçu
+ * venu dépensait avant son destinataire (voir lib/auth-lien.ts).
+ *
+ * Deux phrases comptent plus que tout le reste et figurent dans les trois
+ * langues : **il ne sert qu'une fois**, et **il ne se transfère pas**. Un lien
+ * de récupération fait passer pour son propriétaire quiconque l'ouvre ; le
+ * faire suivre par WhatsApp, c'est donner son compte.
+ */
+const MODPAS: Record<Language, (d: DonneesModpas) => Rendu> = {
+  fr: (d) => ({
+    subject: "Réinitialiser votre mot de passe PASRÈL",
+    text: [
+      "Bonjour,",
+      "",
+      "Vous avez demandé à changer votre mot de passe. Ouvrez ce lien :",
+      d.lien,
+      "",
+      "Il est valable une heure et ne sert qu'une fois.",
+      "",
+      "Ne le faites suivre à personne, même pas à quelqu'un qui vous aide : ce lien ouvre votre compte sans mot de passe. Si une autre personne doit s'en servir, elle doit demander le sien depuis la page de connexion.",
+      "",
+      "Vous n'avez rien demandé ? Ignorez ce message. Votre mot de passe actuel reste valable et personne n'a eu accès à votre compte.",
+      "",
+      "— PASRÈL",
+    ].join("\n"),
+    html: enveloppe(
+      [
+        p("Bonjour,"),
+        p("Vous avez demandé à changer votre mot de passe."),
+        bouton(d.lien, "Choisir un nouveau mot de passe"),
+        p('Le bouton ne marche pas ? Copiez cette adresse dans votre navigateur :'),
+        encadre([`<span style="word-break:break-all;font-size:13px">${d.lien}</span>`]),
+        p("Il est valable <strong>une heure</strong> et ne sert <strong>qu'une fois</strong>."),
+        p("<strong>Ne le faites suivre à personne</strong>, même pas à quelqu'un qui vous aide : ce lien ouvre votre compte sans mot de passe. Si une autre personne doit s'en servir, elle doit demander le sien depuis la page de connexion."),
+        p("Vous n'avez rien demandé ? Ignorez ce message. Votre mot de passe actuel reste valable et personne n'a eu accès à votre compte."),
+      ].join(""),
+      `<a href="${d.baseUrl}/login" style="color:#008069">Page de connexion</a><br>Une question ? Répondez simplement à ce message.<br><br>PASRÈL — Là où les conversations deviennent des clients.`,
+    ),
+  }),
+
+  ht: (d) => ({
+    subject: "Chanje modpas PASRÈL ou",
+    text: [
+      "Bonjou,",
+      "",
+      "Ou mande pou chanje modpas ou. Ouvri lyen sa a :",
+      d.lien,
+      "",
+      "Li valab pou yon èdtan epi li sèvi yon sèl fwa.",
+      "",
+      "Pa voye l bay pèsòn, menm moun k ap ede w : lyen sa a ouvri kont ou san modpas. Si yon lòt moun bezwen sèvi avè l, se pou li mande pa l depi nan paj koneksyon an.",
+      "",
+      "Se pa ou ki mande l ? Pa okipe mesaj sa a. Modpas ou kounye a rete bon e pèsòn pa antre nan kont ou.",
+      "",
+      "— PASRÈL",
+    ].join("\n"),
+    html: enveloppe(
+      [
+        p("Bonjou,"),
+        p("Ou mande pou chanje modpas ou."),
+        bouton(d.lien, "Chwazi yon nouvo modpas"),
+        p("Bouton an pa mache ? Kopye adrès sa a nan navigatè w :"),
+        encadre([`<span style="word-break:break-all;font-size:13px">${d.lien}</span>`]),
+        p("Li valab pou <strong>yon èdtan</strong> epi li sèvi <strong>yon sèl fwa</strong>."),
+        p("<strong>Pa voye l bay pèsòn</strong>, menm moun k ap ede w : lyen sa a ouvri kont ou san modpas. Si yon lòt moun bezwen sèvi avè l, se pou li mande pa l depi nan paj koneksyon an."),
+        p("Se pa ou ki mande l ? Pa okipe mesaj sa a. Modpas ou kounye a rete bon e pèsòn pa antre nan kont ou."),
+      ].join(""),
+      `<a href="${d.baseUrl}/login" style="color:#008069">Paj koneksyon</a><br>Yon kesyon ? Reponn mesaj sa a dirèkteman.<br><br>PASRÈL — Kote konvèsasyon tounen kliyan.`,
+    ),
+  }),
+
+  en: (d) => ({
+    subject: "Reset your PASRÈL password",
+    text: [
+      "Hello,",
+      "",
+      "You asked to change your password. Open this link:",
+      d.lien,
+      "",
+      "It is valid for one hour and works only once.",
+      "",
+      "Do not forward it to anyone, not even someone helping you: this link opens your account without a password. If someone else needs one, they must request their own from the sign-in page.",
+      "",
+      "Did not ask for this? Ignore this message. Your current password still works and nobody has had access to your account.",
+      "",
+      "— PASRÈL",
+    ].join("\n"),
+    html: enveloppe(
+      [
+        p("Hello,"),
+        p("You asked to change your password."),
+        bouton(d.lien, "Choose a new password"),
+        p("Button not working? Copy this address into your browser:"),
+        encadre([`<span style="word-break:break-all;font-size:13px">${d.lien}</span>`]),
+        p("It is valid for <strong>one hour</strong> and works <strong>only once</strong>."),
+        p("<strong>Do not forward it to anyone</strong>, not even someone helping you: this link opens your account without a password. If someone else needs one, they must request their own from the sign-in page."),
+        p("Did not ask for this? Ignore this message. Your current password still works and nobody has had access to your account."),
+      ].join(""),
+      `<a href="${d.baseUrl}/login" style="color:#008069">Sign-in page</a><br>A question? Just reply to this message.<br><br>PASRÈL — Where conversations become customers.`,
+    ),
+  }),
+};
+
+export function courrielModpas(langue: Language, d: DonneesModpas): Rendu {
+  return (MODPAS[langue] ?? MODPAS.fr)(d);
+}

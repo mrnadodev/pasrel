@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { lireJeton } from "@/lib/auth-lien";
 import { CvzMark } from "@/components/CvzMark";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/components/LanguageContext";
@@ -55,6 +56,22 @@ export function ConfirmEmail() {
     const sb = createClient();
 
     async function poser() {
+      // Le jeton haché, quand le lien vient d'un gabarit qui utilise
+      // `{{ .TokenHash }}`. Rien n'est consommé avant cet appel, donc l'aperçu
+      // WhatsApp qui récupère la page ne dépense pas le lien du marchand —
+      // c'est précisément ce qui le faisait « expirer » en quelques secondes.
+      // Voir lib/auth-lien.ts.
+      const j = lireJeton(window.location.search, "signup");
+      if (j) {
+        const { data } = await sb.auth.verifyOtp({ token_hash: j.token_hash, type: j.type });
+        window.history.replaceState(null, "", window.location.pathname);
+        if (annule) return;
+        if (data.session) {
+          router.replace("/");
+          return;
+        }
+      }
+
       const brut = window.location.hash.replace(/^#/, "");
       const p = new URLSearchParams(brut);
       const access_token = p.get("access_token");
