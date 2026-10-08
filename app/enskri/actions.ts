@@ -106,6 +106,44 @@ function setDisplayCookies(ownerName: string) {
   }
 }
 
+/**
+ * Renvoie le lien de confirmation, ou dit pourquoi il n'y a rien à renvoyer.
+ *
+ * Un compte créé puis confirmé, mais dont la boutique n'a jamais été créée,
+ * était un cul-de-sac silencieux : le marchand recommençait l'inscription, et
+ * aucun courriel ne partait — Supabase n'en renvoie pas pour une adresse déjà
+ * confirmée. Il attendait un message qui ne viendrait jamais.
+ *
+ * On ne révèle rien qu'il ne sache déjà : il vient de saisir cette adresse.
+ * Lui dire « ce compte est déjà confirmé, connecte-toi » lui rend une porte,
+ * là où le silence lui en fermait une.
+ */
+export type ResultatRenvoi =
+  | { etat: "envoye" }
+  | { etat: "deja_confirme" }
+  | { etat: "trop_souvent" }
+  | { etat: "echec"; message: string };
+
+export async function renvoyerConfirmation(email: string): Promise<ResultatRenvoi> {
+  const propre = email.trim();
+  if (!propre.includes("@")) return { etat: "echec", message: "Adrès imèl la pa valab" };
+  if (!hasSupabase()) return { etat: "envoye" };
+
+  const sb = createClient();
+  const { error } = await sb.auth.resend({
+    type: "signup",
+    email: propre,
+    options: { emailRedirectTo: `${storefrontBaseUrl()}/konfime` },
+  });
+
+  if (!error) return { etat: "envoye" };
+
+  const m = error.message.toLowerCase();
+  if (/already confirmed|already been confirmed|already registered/.test(m)) return { etat: "deja_confirme" };
+  if (/rate limit|too many|security purposes/.test(m)) return { etat: "trop_souvent" };
+  return { etat: "echec", message: error.message };
+}
+
 export async function registerMerchant(
   input: RegisterInput,
 ): Promise<{ ok: boolean; slug?: string; needsConfirm?: boolean; error?: string }> {

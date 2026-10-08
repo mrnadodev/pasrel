@@ -8,7 +8,13 @@ import { CvzMark } from "@/components/CvzMark";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/components/LanguageContext";
 import { landingCopy } from "@/lib/i18n/landing";
-import { registerMerchant, type RegisterInput, type BrouillonInscription } from "@/app/enskri/actions";
+import {
+  registerMerchant,
+  renvoyerConfirmation,
+  type RegisterInput,
+  type BrouillonInscription,
+  type ResultatRenvoi,
+} from "@/app/enskri/actions";
 import { Select } from "@/components/ui/Select";
 
 /**
@@ -24,18 +30,36 @@ const ATTENTE = {
     titre: "Vérifiez votre boîte mail",
     corps: "Nous venons d'envoyer un lien de confirmation à",
     spam: "Rien reçu ? Regardez dans vos indésirables, et marquez le message comme légitime — les prochains arriveront alors directement.",
+    renvoyer: "Renvoyer le lien",
+    renvoiEnCours: "Envoi…",
+    renvoye: "Lien renvoyé. Regardez aussi dans les indésirables.",
+    dejaConfirme:
+      "Ce compte est déjà confirmé — c'est pour cela qu'aucun message n'arrive. Connectez-vous pour terminer la création de votre commerce.",
+    tropSouvent: "Trop de demandes d'affilée. Réessayez dans quelques minutes.",
     bouton: "Aller à la connexion",
   },
   ht: {
     titre: "Tcheke bwat imèl ou",
     corps: "Nou fèk voye yon lyen konfimasyon nan",
     spam: "Ou pa resevwa anyen ? Gade nan spam ou, epi make mesaj la kòm bon — konsa lòt yo ap rive dirèkteman.",
+    renvoyer: "Voye lyen an ankò",
+    renvoiEnCours: "N ap voye…",
+    renvoye: "Nou voye lyen an ankò. Gade nan spam ou tou.",
+    dejaConfirme:
+      "Kont sa a deja konfime — se poutèt sa okenn mesaj pa rive. Konekte pou w fini kreye biznis ou.",
+    tropSouvent: "Twòp demann youn dèyè lòt. Eseye ankò nan kèk minit.",
     bouton: "Ale nan koneksyon",
   },
   en: {
     titre: "Check your inbox",
     corps: "We have just sent a confirmation link to",
     spam: "Nothing received? Look in your spam folder and mark the message as legitimate — the next ones will then arrive directly.",
+    renvoyer: "Send the link again",
+    renvoiEnCours: "Sending…",
+    renvoye: "Link sent again. Look in your spam folder too.",
+    dejaConfirme:
+      "This account is already confirmed — that is why no message arrives. Sign in to finish creating your business.",
+    tropSouvent: "Too many requests in a row. Try again in a few minutes.",
     bouton: "Go to sign in",
   },
 } as const;
@@ -68,6 +92,9 @@ export function RegisterForm({
   const [error, setError] = useState<string | null>(null);
   /** Adresse à confirmer : tant qu'elle est posée, l'écran d'attente remplace le formulaire. */
   const [aConfirmer, setAConfirmer] = useState<string | null>(null);
+  /** Ce que le renvoi du lien a donné, le cas échéant. */
+  const [renvoi, setRenvoi] = useState<ResultatRenvoi | null>(null);
+  const [renvoiEnCours, demarrerRenvoi] = useTransition();
   // Le métier conservé décide des deux listes : sans ça elles rouvriraient sur
   // « commerce » et la marchande croirait sa saisie perdue.
   const secteurRepris = brouillon?.businessType ? secteurDe(brouillon.businessType) : null;
@@ -144,6 +171,40 @@ export function RegisterForm({
             <div className="rounded-xl bg-[#FFF6EC] px-4 py-3 text-[13px] leading-relaxed text-[#8A4607]">
               {c.spam}
             </div>
+
+            {/* La sortie de secours. Un compte déjà confirmé ne reçoit plus
+                rien : sans ce bouton, on attend un message qui ne viendra
+                jamais, et on finit par abandonner. */}
+            {renvoi?.etat === "deja_confirme" && (
+              <div className="rounded-xl bg-[#E7F1FB] px-4 py-3 text-[13px] leading-relaxed font-medium text-[#1A6BB8]">
+                {c.dejaConfirme}
+              </div>
+            )}
+            {renvoi?.etat === "envoye" && (
+              <div className="rounded-xl bg-[#E7F7F1] px-4 py-3 text-[13px] leading-relaxed font-medium text-[#0B6B57]">
+                {c.renvoye}
+              </div>
+            )}
+            {renvoi?.etat === "trop_souvent" && (
+              <div className="rounded-xl bg-[#FFF6EC] px-4 py-3 text-[13px] leading-relaxed font-medium text-[#8A4607]">
+                {c.tropSouvent}
+              </div>
+            )}
+            {renvoi?.etat === "echec" && (
+              <div className="rounded-xl bg-[#FCE4E4] px-4 py-3 text-[13px] leading-relaxed font-medium text-[#C0392B]">
+                {renvoi.message}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => demarrerRenvoi(async () => setRenvoi(await renvoyerConfirmation(aConfirmer)))}
+              disabled={renvoiEnCours || renvoi?.etat === "deja_confirme"}
+              className="h-12 cursor-pointer rounded-2xl border border-line text-sm font-bold text-ink-soft disabled:opacity-60"
+            >
+              {renvoiEnCours ? c.renvoiEnCours : c.renvoyer}
+            </button>
+
             <Link
               href="/login"
               className="flex h-12 items-center justify-center rounded-2xl bg-brand-green text-sm font-extrabold text-white"
