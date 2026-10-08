@@ -46,6 +46,8 @@ export async function updateSession(request: NextRequest) {
     path === "/konfime" ||
     // Écran expliquant la suspension : il doit rester accessible.
     path === "/sispann" ||
+    // L'histoire de la marque : elle s'adresse à qui n'a pas encore de compte.
+    path === "/apropo" ||
     // Conditions et confidentialité : un visiteur doit pouvoir les lire avant
     // de créer un compte, et un client avant de commander.
     path === "/kondisyon" ||

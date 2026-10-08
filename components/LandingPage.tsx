@@ -621,7 +621,7 @@ export function LandingPage({
             <FooterCol
               title={c.footer.companyCol}
               links={c.footer.companyLinks}
-              hrefs={{ 1: "/kondisyon", 2: "/konfidansyalite" }}
+              hrefs={{ 1: "/apropo", 2: "/kondisyon", 3: "/konfidansyalite" }}
             />
             <FooterCol title={c.footer.languageCol} links={["Français", "Kreyòl", "English"]} />
           </div>

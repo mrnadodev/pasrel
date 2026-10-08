@@ -14,7 +14,12 @@ import type { Language } from "@/lib/i18n/translations";
  */
 export type Titre = Record<Language, string>;
 
-export const TITRES: Record<"conditions" | "confidentialite" | "marketplace" | "suivi", Titre> = {
+export const TITRES: Record<"apropo" | "conditions" | "confidentialite" | "marketplace" | "suivi", Titre> = {
+  apropo: {
+    fr: "L'histoire · PASRÈL",
+    ht: "Istwa a · PASRÈL",
+    en: "The story · PASRÈL",
+  },
   conditions: {
     fr: "Conditions d'utilisation · PASRÈL",
     ht: "Kondisyon itilizasyon · PASRÈL",
