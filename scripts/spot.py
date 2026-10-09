@@ -30,6 +30,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from police import figtree  # noqa: E402
+import fond as FOND  # noqa: E402
 
 RACINE = Path(__file__).resolve().parent.parent
 
@@ -163,44 +164,14 @@ def rrect(d, boite, r, fill=None, outline=None, width=1):
     d.rounded_rectangle(boite, radius=r, fill=fill, outline=outline, width=width)
 
 
-def motif(opacite: float = 0.07) -> Image.Image:
-    """Le motif de bulles des affiches, dessiné une fois pour toutes."""
-    tuile = 120
-    m = Image.new("L", (tuile, tuile), 0)
-    g = ImageDraw.Draw(m)
-    g.ellipse((4, 2, 44, 42), fill=255)
-    g.polygon([(14, 36), (14, 52), (30, 36)], fill=255)
-    grand = Image.new("L", (L + 240, H + 240), 0)
-    for y in range(0, H + 240, tuile):
-        for x in range(0, L + 240, tuile):
-            grand.paste(m, (x, y))
-    grand = grand.rotate(8, resample=Image.BICUBIC)
-    couche = Image.new("RGBA", grand.size, BLAN + (0,))
-    couche.putalpha(grand.point(lambda v: int(v * opacite)))
-    return couche
+def fond(img, t, couleur, avec_motif=True):
+    """Le fond des artboards — extrait dans scripts/fond.py pour que le spot
+    et le film partagent exactement le meme, motif de bulles compris."""
+    FOND.aplat(img, t, couleur, avec_motif)
 
 
-MOTIF = None
-
-
-def fond(img: Image.Image, t: float, couleur, avec_motif=True):
-    img.paste(Image.new("RGB", (L, H), couleur), (0, 0))
-    if avec_motif:
-        global MOTIF
-        if MOTIF is None:
-            MOTIF = motif()
-        # Une dérive lente, comme sur les affiches.
-        dx = -int((t * 3.1) % 120)
-        img.paste(MOTIF, (dx - 120, dx - 120), MOTIF)
-
-
-def degrade(img: Image.Image, haut, bas):
-    """Le dégradé de la story « un seul lien »."""
-    bande = Image.new("RGB", (1, H))
-    p = bande.load()
-    for y in range(H):
-        p[0, y] = melange(haut, bas, y / H)
-    img.paste(bande.resize((L, H)), (0, 0))
+def degrade(img, haut, bas):
+    FOND.degrade(img, 0.0, haut, bas)
 
 
 # ──────────────────────────────── les plans ────────────────────────────────

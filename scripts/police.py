@@ -27,6 +27,41 @@ REPLIS = [
 ]
 
 
+def newsreader() -> tuple[Path, bool]:
+    """Le serif du film. Même logique que Figtree, autre dépôt.
+
+    Le serif n'est pas un ornement : le mot PASRÈL du logo est composé en
+    serif. Le film emprunte la lettre de la marque, pas celle de l'interface.
+    """
+    CACHE.mkdir(parents=True, exist_ok=True)
+    cible = CACHE / "newsreader.ttf"
+    if cible.exists() and cible.stat().st_size > 20_000:
+        return cible, True
+
+    sources = [
+        "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/Newsreader%5Bopsz,wght%5D.ttf",
+        "https://raw.githubusercontent.com/google/fonts/main/ofl/eczar/Eczar%5Bwght%5D.ttf",
+    ]
+    dernier = "aucune source essayée"
+    for url in sources:
+        try:
+            requete = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(requete, timeout=25) as r:
+                brut = r.read()
+            if len(brut) < 20_000 or brut[:4] not in (b"\x00\x01\x00\x00", b"true", b"OTTO"):
+                raise RuntimeError("ce n'est pas un TrueType")
+            cible.write_bytes(brut)
+            return cible, True
+        except Exception as e:
+            dernier = f"{type(e).__name__}: {e}"
+
+    print(f"Newsreader indisponible ({dernier}) — on reprend un serif du systeme.")
+    for p in (Path("C:/Windows/Fonts/georgia.ttf"), Path("C:/Windows/Fonts/times.ttf")):
+        if p.exists():
+            return p, False
+    raise SystemExit("aucun serif utilisable sur cette machine")
+
+
 def figtree(graisse: int = 800) -> tuple[Path, bool]:
     """Rend le chemin d'un TTF et si c'est bien Figtree."""
     CACHE.mkdir(parents=True, exist_ok=True)
