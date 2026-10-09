@@ -47,3 +47,7 @@ yarn-error.log*
 *.sql.gz
 *.dump
 dumps/
+
+# Environnement Python local (faster-whisper, outils media). Hors du depot.
+.venv/
+__pycache__/
