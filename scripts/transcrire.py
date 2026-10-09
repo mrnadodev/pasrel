@@ -76,6 +76,16 @@ def horodatage(secondes: float) -> str:
 
 
 def main() -> int:
+    # La console Windows est en cp1252 : un accent ou une flèche la fait
+    # lever une exception, et la transcription meurt en l'AFFICHANT, après
+    # l'avoir calculée. Le fichier SRT, lui, est écrit en UTF-8 depuis le
+    # début ; c'est la sortie écran qu'il faut mettre au même régime.
+    for flux in (sys.stdout, sys.stderr):
+        try:
+            flux.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
     a = argparse.ArgumentParser(description="Transcrit un media et ecrit un SRT a cote.")
     a.add_argument("fichier", type=Path)
     a.add_argument("--modele", default="small", help="tiny, base, small, medium, large-v3")
